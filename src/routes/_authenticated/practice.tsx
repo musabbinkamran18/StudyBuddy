@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import {
   generatePracticeQuestions,
+  shuffleQuestionOptions,
   type PracticeQuestion,
   type GeneratePracticeInput,
   XP_PER_DIFFICULTY,
@@ -22,11 +23,13 @@ import {
 import { fetchMyProfile, fetchSubjects, fetchTopics } from "@/lib/profile-data";
 import { toast } from "sonner";
 import { recordSessionCompleted, loadRewards } from "@/lib/rewards";
-import { earnCoins, hasXpBoost, useXpBoost, loadCoinState } from "@/lib/coins";
+import { earnCoins, hasXpBoost, useXpBoost as consumeXpBoost, loadCoinState } from "@/lib/coins";
 import { trackActivity } from "@/lib/missions";
 import { updateExtendedStats } from "@/lib/extended-stats";
 import { checkAndUnlockAchievements, markNotified } from "@/lib/achievements";
 import { logStudyActivity } from "@/lib/study-log";
+import { saveMistake } from "@/lib/progress";
+import { loadUserPrefs } from "@/lib/user-prefs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -83,12 +86,17 @@ function PracticePage() {
   const availableTopics = topicQueries[subjectIndex]?.data ?? [];
   const selectedTopic = availableTopics.find((t) => t.id === selectedTopicId) ?? null;
 
+  // User prefs for session settings
+  const userPrefs = loadUserPrefs(user.id);
+  const sessionHearts = userPrefs.livesPerSession === 0 ? 999 : userPrefs.livesPerSession;
+  const sessionQuestions = userPrefs.questionsPerSession;
+
   // Session state
   const [screen, setScreen] = useState<Screen>("setup");
   const [session, setSession] = useState<SessionState>({
     questions: [],
     current: 0,
-    hearts: HEARTS_PER_SESSION,
+    hearts: sessionHearts,
     xpEarned: 0,
     correctCount: 0,
     mistakes: [],
@@ -97,15 +105,13 @@ function PracticePage() {
   });
 
   const generateMutation = useMutation({
-    mutationFn: (input: GeneratePracticeInput) =>
-      generatePracticeQuestions({ data: input }),
+    mutationFn: (input: GeneratePracticeInput) => generatePracticeQuestions({ data: input }),
     onSuccess: ({ questions }) => {
       const boostActive = hasXpBoost(user.id);
-      if (boostActive) useXpBoost(user.id);
       setSession({
-        questions,
+        questions: shuffleQuestionOptions(questions),
         current: 0,
-        hearts: HEARTS_PER_SESSION,
+        hearts: sessionHearts,
         xpEarned: 0,
         correctCount: 0,
         mistakes: [],
@@ -114,7 +120,16 @@ function PracticePage() {
       });
       setScreen("question");
     },
-    onError: () => setScreen("setup"),
+    onError: (error) => {
+      console.error("generatePracticeQuestions failed", error);
+      const message = error instanceof Error ? error.message : undefined;
+      toast.error(
+        message
+          ? `Couldn't generate questions: ${message}`
+          : "Couldn't generate questions. Please try again.",
+      );
+      setScreen("setup");
+    },
   });
 
   function startSession() {
@@ -126,7 +141,8 @@ function PracticePage() {
       grade: draft?.grade ?? "7",
       difficulty: selectedDifficulty,
       curriculum: draft?.curriculum ?? "",
-      count: 10,
+      count: sessionQuestions,
+      learningStyle: userPrefs.learningStyle,
     });
   }
 
@@ -136,6 +152,16 @@ function PracticePage() {
     const isCorrect = option === q.correct_answer;
     const xp = isCorrect ? XP_PER_DIFFICULTY[q.difficulty] * session.xpMultiplier : 0;
     const newHearts = isCorrect ? session.hearts : session.hearts - 1;
+
+    if (!isCorrect) {
+      saveMistake(user.id, {
+        question: q.question,
+        correct_answer: q.correct_answer,
+        user_answer: option,
+        subject: selectedSubject?.name ?? "",
+        topic: q.topic || selectedTopic?.name || "",
+      });
+    }
 
     setSession((prev) => ({
       ...prev,
@@ -156,14 +182,17 @@ function PracticePage() {
     const next = session.current + 1;
     if (next >= session.questions.length) {
       const perfect = session.mistakes.length === 0;
+      const perfectBonus = perfect ? 20 : 0;
+      const totalXp = session.xpEarned + perfectBonus;
+      if (session.xpMultiplier === 2) consumeXpBoost(user.id);
       recordSessionCompleted(user.id, Math.ceil(session.questions.length * 1.5));
       earnCoins(user.id, 15 + (perfect ? 10 : 0));
       trackActivity(user.id, {
-        xpEarned: session.xpEarned,
+        xpEarned: totalXp,
         questionsCorrect: session.correctCount,
       });
       logStudyActivity(user.id, {
-        xp: session.xpEarned,
+        xp: totalXp,
         questions: session.correctCount,
         sessions: 1,
       });
@@ -175,12 +204,20 @@ function PracticePage() {
       });
       const freshRewards = loadRewards(user.id);
       const freshCoins = loadCoinState(user.id);
-      const newAchievements = checkAndUnlockAchievements(user.id, freshRewards, updatedExtended, freshCoins);
+      const newAchievements = checkAndUnlockAchievements(
+        user.id,
+        freshRewards,
+        updatedExtended,
+        freshCoins,
+      );
       newAchievements.forEach((a) =>
         toast.success(`${a.emoji} ${a.label}`, { description: a.description }),
       );
       if (newAchievements.length > 0)
-        markNotified(user.id, newAchievements.map((a) => a.id));
+        markNotified(
+          user.id,
+          newAchievements.map((a) => a.id),
+        );
       setScreen("summary");
       return;
     }
@@ -351,7 +388,8 @@ function PracticePage() {
     const q = session.questions[session.current];
     if (!q) return null;
     const isCorrect = session.selected === q.correct_answer;
-    const progress = ((session.current + (screen === "feedback" ? 1 : 0)) / session.questions.length) * 100;
+    const progress =
+      ((session.current + (screen === "feedback" ? 1 : 0)) / session.questions.length) * 100;
 
     return (
       <div className="flex min-h-screen flex-col bg-background">
@@ -397,12 +435,15 @@ function PracticePage() {
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Question {session.current + 1} of {session.questions.length}
             </p>
-            <h2 className="mb-8 text-xl font-semibold leading-snug text-foreground">{q.question}</h2>
+            <h2 className="mb-8 text-xl font-semibold leading-snug text-foreground">
+              {q.question}
+            </h2>
 
             {/* Options */}
             <div className="space-y-3">
               {q.options.map((opt) => {
-                let style = "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/5";
+                let style =
+                  "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/5";
                 if (screen === "feedback") {
                   if (opt === q.correct_answer) {
                     style = "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400";
@@ -445,9 +486,7 @@ function PracticePage() {
           <div
             className={cn(
               "border-t px-4 py-5 sm:px-6",
-              isCorrect
-                ? "border-green-500/30 bg-green-500/10"
-                : "border-red-500/30 bg-red-500/10",
+              isCorrect ? "border-green-500/30 bg-green-500/10" : "border-red-500/30 bg-red-500/10",
             )}
           >
             <div className="mx-auto max-w-xl">

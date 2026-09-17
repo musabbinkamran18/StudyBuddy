@@ -17,26 +17,26 @@ export const DEFAULT_PREFS: TutorPrefs = {
 };
 
 export const PERSONALITY_LABELS: Record<TutorPersonality, { emoji: string; label: string }> = {
-  chill:        { emoji: "😎", label: "Chill & Friendly" },
-  funny:        { emoji: "😂", label: "Funny" },
-  strict:       { emoji: "🧑‍🏫", label: "Strict Teacher" },
+  chill: { emoji: "😎", label: "Chill & Friendly" },
+  funny: { emoji: "😂", label: "Funny" },
+  strict: { emoji: "🧑‍🏫", label: "Strict Teacher" },
   motivational: { emoji: "🚀", label: "Motivational Coach" },
-  genius:       { emoji: "🧠", label: "Genius/Expert" },
+  genius: { emoji: "🧠", label: "Genius/Expert" },
 };
 
 export const STYLE_LABELS: Record<ExplanationStyle, { emoji: string; label: string }> = {
-  short:      { emoji: "⚡", label: "Super Short" },
-  detailed:   { emoji: "📖", label: "Detailed" },
+  short: { emoji: "⚡", label: "Super Short" },
+  detailed: { emoji: "📖", label: "Detailed" },
   stepbystep: { emoji: "🪜", label: "Step-by-step" },
-  examples:   { emoji: "💡", label: "Examples First" },
-  analogy:    { emoji: "🎨", label: "Visual/Analogy" },
+  examples: { emoji: "💡", label: "Examples First" },
+  analogy: { emoji: "🎨", label: "Visual/Analogy" },
 };
 
 export const LANGUAGE_LABELS: Record<TutorLanguage, { emoji: string; label: string }> = {
   english: { emoji: "🇬🇧", label: "English" },
-  urdu:    { emoji: "🇵🇰", label: "Urdu" },
-  simple:  { emoji: "🔤", label: "Simple English" },
-  mixed:   { emoji: "🌐", label: "Mixed (Urdu+English)" },
+  urdu: { emoji: "🇵🇰", label: "Urdu" },
+  simple: { emoji: "🔤", label: "Simple English" },
+  mixed: { emoji: "🌐", label: "Mixed (Urdu+English)" },
 };
 
 const PREFS_KEY = (userId: string) => `tutor-prefs:${userId}`;

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {
   getCurrentLeague,
@@ -6,6 +7,7 @@ import {
   type LeaderboardEntry,
 } from "@/lib/leaderboard";
 import { loadAvatar } from "@/lib/avatar";
+import { getWeeklyStats } from "@/lib/study-log";
 
 interface LeagueCardProps {
   totalXp: number;
@@ -19,7 +21,8 @@ export function LeagueCard({ totalXp, userName, userId }: LeagueCardProps) {
 
   useEffect(() => {
     const userAvatar = loadAvatar(userId);
-    const board = generateWeeklyLeaderboard(totalXp, userName, userAvatar);
+    const weeklyXp = getWeeklyStats(userId).reduce((sum, d) => sum + d.xp, 0);
+    const board = generateWeeklyLeaderboard(weeklyXp, userName, userAvatar);
     setLeaderboard(board);
   }, [totalXp, userName, userId]);
 
@@ -29,7 +32,13 @@ export function LeagueCard({ totalXp, userName, userId }: LeagueCardProps) {
   const visible = getVisibleEntries(leaderboard, userRank);
 
   const nextLeague = league.nextXp
-    ? { xp: league.nextXp, pct: Math.min(100, Math.round(((totalXp - league.minXp) / (league.nextXp - league.minXp)) * 100)) }
+    ? {
+        xp: league.nextXp,
+        pct: Math.min(
+          100,
+          Math.round(((totalXp - league.minXp) / (league.nextXp - league.minXp)) * 100),
+        ),
+      }
     : null;
 
   return (
@@ -75,15 +84,21 @@ export function LeagueCard({ totalXp, userName, userId }: LeagueCardProps) {
       )}
 
       {/* Mini leaderboard */}
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          This week
+        </p>
+        <Link to="/leaderboard" className="text-xs font-medium text-primary hover:underline">
+          Full leaderboard →
+        </Link>
+      </div>
       <div className="space-y-1.5">
         {visible.map((entry) => (
           <div
             key={entry.rank}
             className={cn(
               "flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors",
-              entry.isCurrentUser
-                ? "bg-primary/10 font-semibold"
-                : "hover:bg-muted/50",
+              entry.isCurrentUser ? "bg-primary/10 font-semibold" : "hover:bg-muted/50",
             )}
           >
             <span

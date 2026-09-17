@@ -67,8 +67,20 @@ const MISSION_POOL: Omit<Mission, "id" | "progress" | "claimed">[] = [
   { emoji: "⭐", title: "Earn 200 XP today", target: 200, rewardCoins: 35, rewardXp: 50 },
   { emoji: "📚", title: "Complete 2 lessons", target: 2, rewardCoins: 20, rewardXp: 40 },
   { emoji: "📚", title: "Complete 3 lessons", target: 3, rewardCoins: 30, rewardXp: 50 },
-  { emoji: "🎯", title: "Answer 10 questions correctly", target: 10, rewardCoins: 15, rewardXp: 25 },
-  { emoji: "🎯", title: "Answer 20 questions correctly", target: 20, rewardCoins: 25, rewardXp: 40 },
+  {
+    emoji: "🎯",
+    title: "Answer 10 questions correctly",
+    target: 10,
+    rewardCoins: 15,
+    rewardXp: 25,
+  },
+  {
+    emoji: "🎯",
+    title: "Answer 20 questions correctly",
+    target: 20,
+    rewardCoins: 25,
+    rewardXp: 40,
+  },
   { emoji: "👹", title: "Defeat a Boss Battle", target: 1, rewardCoins: 40, rewardXp: 60 },
   { emoji: "🔥", title: "Earn 50 XP today", target: 50, rewardCoins: 10, rewardXp: 15 },
 ];
@@ -146,7 +158,10 @@ export function syncMissionProgress(userId: string): Mission[] {
     return { ...m, progress };
   });
 
-  localStorage.setItem(missionsKey(userId), JSON.stringify({ date: todayKey(), missions: updated }));
+  localStorage.setItem(
+    missionsKey(userId),
+    JSON.stringify({ date: todayKey(), missions: updated }),
+  );
   return updated;
 }
 
@@ -159,6 +174,9 @@ export function claimMission(
   if (!mission || mission.claimed || mission.progress < mission.target) return null;
 
   const updated = missions.map((m) => (m.id === missionId ? { ...m, claimed: true } : m));
-  localStorage.setItem(missionsKey(userId), JSON.stringify({ date: todayKey(), missions: updated }));
+  localStorage.setItem(
+    missionsKey(userId),
+    JSON.stringify({ date: todayKey(), missions: updated }),
+  );
   return { coins: mission.rewardCoins, xp: mission.rewardXp };
 }

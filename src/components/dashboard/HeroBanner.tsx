@@ -1,10 +1,13 @@
 import { ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { QuickActions } from "./QuickActions";
 
 interface HeroBannerProps {
   userName: string;
   subjectCount: number;
+  examDays?: number | null;
+  examLabel?: string;
 }
 
 /**
@@ -65,7 +68,7 @@ function HeroArt() {
   );
 }
 
-export function HeroBanner({ userName, subjectCount }: HeroBannerProps) {
+export function HeroBanner({ userName, subjectCount, examDays, examLabel }: HeroBannerProps) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/70 shadow-[var(--shadow-elevated)]">
       <HeroArt />
@@ -84,10 +87,21 @@ export function HeroBanner({ userName, subjectCount }: HeroBannerProps) {
             topic and take your first step today.
           </p>
 
-          <Button className="mt-7 h-11 rounded-full px-7 text-base font-semibold">
-            Start Learning
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          {examDays != null && (
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-sm font-medium text-amber-700 dark:text-amber-400">
+              <span>📅</span>
+              {examDays === 0
+                ? `${examLabel || "Exam"} is TODAY — you got this!`
+                : `${examDays}d until ${examLabel || "your exam"}`}
+            </div>
+          )}
+
+          <Link to="/practice">
+            <Button className="mt-5 h-11 rounded-full px-7 text-base font-semibold">
+              Start Learning
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
 
         <div className="w-full shrink-0 lg:w-[300px]">

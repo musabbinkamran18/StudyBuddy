@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ChevronLeft, ChevronRight, Trash2, CheckCircle2, RefreshCw, Clock } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Trash2,
+  CheckCircle2,
+  RefreshCw,
+  Clock,
+} from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import { TopBar } from "@/components/dashboard/TopBar";
 import { Button } from "@/components/ui/button";
@@ -68,8 +76,7 @@ function MistakesPage() {
 
   const subjects = Array.from(new Set(mistakes.map((m) => m.subject))).sort();
 
-  const filtered =
-    filter === "all" ? mistakes : mistakes.filter((m) => m.subject === filter);
+  const filtered = filter === "all" ? mistakes : mistakes.filter((m) => m.subject === filter);
 
   const dueCount = filtered.filter(isDue).length;
 
@@ -127,7 +134,10 @@ function MistakesPage() {
                 <div className="flex items-center gap-2">
                   <div className="flex rounded-xl border border-border p-0.5">
                     <button
-                      onClick={() => { setMode("list"); setFlipped(false); }}
+                      onClick={() => {
+                        setMode("list");
+                        setFlipped(false);
+                      }}
                       className={cn(
                         "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                         mode === "list"
@@ -138,7 +148,11 @@ function MistakesPage() {
                       List
                     </button>
                     <button
-                      onClick={() => { setMode("flashcard"); setCardIndex(0); setFlipped(false); }}
+                      onClick={() => {
+                        setMode("flashcard");
+                        setCardIndex(0);
+                        setFlipped(false);
+                      }}
                       className={cn(
                         "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                         mode === "flashcard"
@@ -196,7 +210,11 @@ function MistakesPage() {
                       return (
                         <button
                           key={s}
-                          onClick={() => { setFilter(s); setCardIndex(0); setFlipped(false); }}
+                          onClick={() => {
+                            setFilter(s);
+                            setCardIndex(0);
+                            setFlipped(false);
+                          }}
                           className={cn(
                             "rounded-full px-3 py-1 text-xs font-medium transition-colors",
                             filter === s
@@ -232,8 +250,14 @@ function MistakesPage() {
                     cardIndex={cardIndex}
                     flipped={flipped}
                     setFlipped={setFlipped}
-                    onPrev={() => { setCardIndex((i) => i - 1); setFlipped(false); }}
-                    onNext={() => { setCardIndex((i) => i + 1); setFlipped(false); }}
+                    onPrev={() => {
+                      setCardIndex((i) => i - 1);
+                      setFlipped(false);
+                    }}
+                    onNext={() => {
+                      setCardIndex((i) => i + 1);
+                      setFlipped(false);
+                    }}
                     onAdvance={() => currentCard && handleAdvance(currentCard.id)}
                     onReset={() => currentCard && handleReset(currentCard.id)}
                   />
@@ -268,10 +292,12 @@ function MistakeCard({ mistake, onAdvance, onReset }: MistakeCardProps) {
   });
 
   return (
-    <div className={cn(
-      "rounded-2xl border overflow-hidden transition-colors",
-      due ? "border-amber-500/30 bg-amber-500/5" : "border-border bg-card",
-    )}>
+    <div
+      className={cn(
+        "rounded-2xl border overflow-hidden transition-colors",
+        due ? "border-amber-500/30 bg-amber-500/5" : "border-border bg-card",
+      )}
+    >
       <button onClick={() => setExpanded((v) => !v)} className="w-full p-4 text-left">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -295,10 +321,12 @@ function MistakeCard({ mistake, onAdvance, onReset }: MistakeCardProps) {
               {mistake.question}
             </p>
           </div>
-          <RefreshCw className={cn(
-            "mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform",
-            expanded && "rotate-180",
-          )} />
+          <RefreshCw
+            className={cn(
+              "mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+              expanded && "rotate-180",
+            )}
+          />
         </div>
       </button>
 
@@ -306,11 +334,15 @@ function MistakeCard({ mistake, onAdvance, onReset }: MistakeCardProps) {
         <div className="border-t border-border px-4 pb-4 pt-3">
           <div className="mb-3 grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-red-500/10 p-3">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-red-500">Your answer</p>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-red-500">
+                Your answer
+              </p>
               <p className="text-xs text-foreground">{mistake.user_answer}</p>
             </div>
             <div className="rounded-xl bg-green-500/10 p-3">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-green-600">Correct answer</p>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-green-600">
+                Correct answer
+              </p>
               <p className="text-xs font-medium text-foreground">{mistake.correct_answer}</p>
             </div>
           </div>
@@ -335,7 +367,8 @@ function MistakeCard({ mistake, onAdvance, onReset }: MistakeCardProps) {
             </Button>
           </div>
           <p className="mt-2 text-center text-[10px] text-muted-foreground">
-            Interval: every {mistake.interval ?? 1} day{(mistake.interval ?? 1) !== 1 ? "s" : ""} · {mistake.repetitions ?? 0} correct recalls
+            Interval: every {mistake.interval ?? 1} day{(mistake.interval ?? 1) !== 1 ? "s" : ""} ·{" "}
+            {mistake.repetitions ?? 0} correct recalls
           </p>
         </div>
       )}
@@ -391,7 +424,10 @@ function FlashcardView({
       >
         <div
           className="absolute inset-0 transition-transform duration-500"
-          style={{ transformStyle: "preserve-3d", transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
+          style={{
+            transformStyle: "preserve-3d",
+            transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+          }}
         >
           {/* Front */}
           <div
@@ -406,7 +442,9 @@ function FlashcardView({
                 {card.topic}
               </span>
             </div>
-            <p className="text-base font-semibold leading-relaxed text-foreground">{card.question}</p>
+            <p className="text-base font-semibold leading-relaxed text-foreground">
+              {card.question}
+            </p>
             <p className="mt-6 text-xs text-muted-foreground">Tap to reveal answer</p>
           </div>
 
@@ -415,7 +453,9 @@ function FlashcardView({
             className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl border border-green-500/30 bg-green-500/5 p-8 text-center"
             style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           >
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-green-600">Correct Answer</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-green-600">
+              Correct Answer
+            </p>
             <p className="text-lg font-bold text-foreground">{card.correct_answer}</p>
             {card.user_answer && (
               <p className="mt-3 text-xs text-muted-foreground">
@@ -429,7 +469,13 @@ function FlashcardView({
 
       {/* Navigation + response buttons */}
       <div className="mt-6 flex items-center gap-3">
-        <Button size="icon" variant="outline" disabled={cardIndex === 0} onClick={onPrev} className="h-10 w-10 rounded-xl">
+        <Button
+          size="icon"
+          variant="outline"
+          disabled={cardIndex === 0}
+          onClick={onPrev}
+          className="h-10 w-10 rounded-xl"
+        >
           <ChevronLeft className="h-4 w-4" />
         </Button>
 
@@ -451,14 +497,20 @@ function FlashcardView({
           Still struggling
         </Button>
 
-        <Button size="icon" variant="outline" disabled={cardIndex === total - 1} onClick={onNext} className="h-10 w-10 rounded-xl">
+        <Button
+          size="icon"
+          variant="outline"
+          disabled={cardIndex === total - 1}
+          onClick={onNext}
+          className="h-10 w-10 rounded-xl"
+        >
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        "Got it!" schedules next review in {Math.min((card.interval ?? 1) * 2, 30)} days ·
-        "Still struggling" resets to tomorrow
+        "Got it!" schedules next review in {Math.min((card.interval ?? 1) * 2, 30)} days · "Still
+        struggling" resets to tomorrow
       </p>
     </div>
   );

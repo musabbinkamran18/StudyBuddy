@@ -7,13 +7,7 @@ import { TopBar } from "@/components/dashboard/TopBar";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMyProfile } from "@/lib/profile-data";
-import {
-  loadCoinState,
-  buyItem,
-  SHOP_ITEMS,
-  LOGIN_REWARDS,
-  type CoinState,
-} from "@/lib/coins";
+import { loadCoinState, buyItem, SHOP_ITEMS, LOGIN_REWARDS, type CoinState } from "@/lib/coins";
 import { updateExtendedStats } from "@/lib/extended-stats";
 import { checkAndUnlockAchievements, markNotified } from "@/lib/achievements";
 import { loadRewards } from "@/lib/rewards";
@@ -53,7 +47,10 @@ function ShopPage() {
         toast.success(`${a.emoji} ${a.label}`, { description: a.description }),
       );
       if (newAchievements.length > 0)
-        markNotified(user.id, newAchievements.map((a) => a.id));
+        markNotified(
+          user.id,
+          newAchievements.map((a) => a.id),
+        );
     } else {
       setError(result.error ?? "Purchase failed");
       setTimeout(() => setError(null), 3000);
@@ -147,9 +144,7 @@ function ShopPage() {
                       <div className="flex items-center gap-1.5">
                         <span className="text-lg">💎</span>
                         <span className="text-lg font-bold text-foreground">{item.price}</span>
-                        <span className="text-xs text-muted-foreground">
-                          · {owned} owned
-                        </span>
+                        <span className="text-xs text-muted-foreground">· {owned} owned</span>
                       </div>
 
                       <Button

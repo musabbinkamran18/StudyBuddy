@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { fetchSubjects, fetchMyProfile, saveMyProfile } from "@/lib/profile-data";
 import {
   emptyDraft,
@@ -23,7 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { isDemo } from "@/lib/backend";
+import { useSignOut } from "@/hooks/useSignOut";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -56,6 +55,7 @@ const STEPS = [
 
 function Onboarding() {
   const navigate = useNavigate();
+  const signOut = useSignOut();
   const { user } = Route.useRouteContext();
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<LearningProfileDraft>(emptyDraft);
@@ -112,8 +112,14 @@ function Onboarding() {
       await saveMyProfile(user.id, draft);
       toast.success("Your learning profile is ready.");
       navigate({ to: "/dashboard", replace: true });
-    } catch {
-      toast.error("We couldn't save your profile. Please try again.");
+    } catch (error) {
+      console.error("saveMyProfile failed", error);
+      const message = error instanceof Error ? error.message : undefined;
+      toast.error(
+        message
+          ? `We couldn't save your profile: ${message}`
+          : "We couldn't save your profile. Please try again.",
+      );
     } finally {
       setSaving(false);
     }
@@ -198,14 +204,7 @@ function Onboarding() {
         <button
           type="button"
           className="mt-6 text-xs text-muted-foreground hover:text-foreground"
-          onClick={async () => {
-            if (await isDemo()) {
-              navigate({ to: "/auth", replace: true });
-              return;
-            }
-            await supabase.auth.signOut();
-            navigate({ to: "/auth", replace: true });
-          }}
+          onClick={() => void signOut()}
         >
           Sign out
         </button>

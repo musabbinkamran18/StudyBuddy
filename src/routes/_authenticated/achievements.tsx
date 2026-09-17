@@ -26,7 +26,15 @@ export const Route = createFileRoute("/_authenticated/achievements")({
 });
 
 const CATEGORIES: AchievementCategory[] = [
-  "streak", "xp", "questions", "lessons", "boss", "mastery", "perfect", "coins", "missions",
+  "streak",
+  "xp",
+  "questions",
+  "lessons",
+  "boss",
+  "mastery",
+  "perfect",
+  "coins",
+  "missions",
 ];
 
 function AchievementsPage() {
@@ -53,9 +61,8 @@ function AchievementsPage() {
   const coins = coinState.balance;
   const avatar = loadAvatar(user.id);
 
-  const displayed = filter === "all"
-    ? ALL_ACHIEVEMENTS
-    : ALL_ACHIEVEMENTS.filter((a) => a.category === filter);
+  const displayed =
+    filter === "all" ? ALL_ACHIEVEMENTS : ALL_ACHIEVEMENTS.filter((a) => a.category === filter);
 
   const unlockedCount = ALL_ACHIEVEMENTS.filter((a) => unlockedIds.includes(a.id)).length;
   const totalCount = ALL_ACHIEVEMENTS.length;
@@ -86,9 +93,20 @@ function AchievementsPage() {
               <div className="text-right">
                 <div className="relative h-14 w-14">
                   <svg className="h-14 w-14 -rotate-90" viewBox="0 0 56 56">
-                    <circle cx="28" cy="28" r="22" fill="none" strokeWidth="5" className="stroke-muted" />
                     <circle
-                      cx="28" cy="28" r="22" fill="none" strokeWidth="5"
+                      cx="28"
+                      cy="28"
+                      r="22"
+                      fill="none"
+                      strokeWidth="5"
+                      className="stroke-muted"
+                    />
+                    <circle
+                      cx="28"
+                      cy="28"
+                      r="22"
+                      fill="none"
+                      strokeWidth="5"
                       className="stroke-primary transition-all"
                       strokeDasharray={`${(unlockedCount / totalCount) * 138.2} 138.2`}
                       strokeLinecap="round"
@@ -120,7 +138,9 @@ function AchievementsPage() {
                 All ({ALL_ACHIEVEMENTS.length})
               </Button>
               {CATEGORIES.map((cat) => {
-                const catCount = ALL_ACHIEVEMENTS.filter((a) => a.category === cat && unlockedIds.includes(a.id)).length;
+                const catCount = ALL_ACHIEVEMENTS.filter(
+                  (a) => a.category === cat && unlockedIds.includes(a.id),
+                ).length;
                 const catTotal = ALL_ACHIEVEMENTS.filter((a) => a.category === cat).length;
                 return (
                   <Button
@@ -204,7 +224,9 @@ function AchievementsPage() {
                         {prog && !unlocked && (
                           <div className="mt-2">
                             <div className="mb-1 flex justify-between text-[10px] text-muted-foreground">
-                              <span>{prog.current.toLocaleString()} / {prog.target.toLocaleString()}</span>
+                              <span>
+                                {prog.current.toLocaleString()} / {prog.target.toLocaleString()}
+                              </span>
                               <span>{progPct}%</span>
                             </div>
                             <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
@@ -218,9 +240,7 @@ function AchievementsPage() {
                       </div>
 
                       {/* Unlocked badge */}
-                      {unlocked && (
-                        <div className="shrink-0 text-xl">✅</div>
-                      )}
+                      {unlocked && <div className="shrink-0 text-xl">✅</div>}
                     </div>
                   </div>
                 );

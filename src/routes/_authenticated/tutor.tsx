@@ -57,9 +57,7 @@ function TutorPage() {
 
   const draft = profileQuery.data?.draft;
   const allSubjects = subjectsQuery.data ?? [];
-  const enrolledSubjects = allSubjects.filter((s) =>
-    draft?.subjectIds.includes(s.id),
-  );
+  const enrolledSubjects = allSubjects.filter((s) => draft?.subjectIds.includes(s.id));
   const enrolledSubjectNames = enrolledSubjects.map((s) => s.name);
 
   // Prefs (localStorage)
@@ -140,7 +138,12 @@ function TutorPage() {
   const quickPrompts =
     enrolledSubjects.length > 0
       ? enrolledSubjects.map((s) => `Help me with ${s.name}`)
-      : ["Help me understand fractions", "Explain photosynthesis", "What is Newton's first law?", "Help me with essay writing"];
+      : [
+          "Help me understand fractions",
+          "Explain photosynthesis",
+          "What is Newton's first law?",
+          "Help me with essay writing",
+        ];
 
   const activePersonality = PERSONALITY_LABELS[prefs.personality];
   const activeStyle = STYLE_LABELS[prefs.style];
@@ -162,9 +165,8 @@ function TutorPage() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-foreground">Study Buddy</p>
               <p className="truncate text-xs text-muted-foreground">
-                {activePersonality.emoji} {activePersonality.label} ·{" "}
-                {activeStyle.emoji} {activeStyle.label} ·{" "}
-                {activeLanguage.emoji} {activeLanguage.label}
+                {activePersonality.emoji} {activePersonality.label} · {activeStyle.emoji}{" "}
+                {activeStyle.label} · {activeLanguage.emoji} {activeLanguage.label}
               </p>
             </div>
 
@@ -187,82 +189,97 @@ function TutorPage() {
 
                   {/* Personality */}
                   <div>
-                    <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">Personality</p>
+                    <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Personality
+                    </p>
                     <div className="grid grid-cols-1 gap-1">
-                      {(Object.entries(PERSONALITY_LABELS) as [TutorPersonality, typeof PERSONALITY_LABELS[TutorPersonality]][]).map(
-                        ([key, { emoji, label }]) => (
-                          <button
-                            key={key}
-                            onClick={() => updatePrefs({ personality: key })}
-                            className={cn(
-                              "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
-                              prefs.personality === key
-                                ? "bg-primary/10 text-primary font-medium"
-                                : "text-muted-foreground hover:bg-muted",
-                            )}
-                          >
-                            <span>{emoji}</span>
-                            <span>{label}</span>
-                            {prefs.personality === key && (
-                              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
-                            )}
-                          </button>
-                        ),
-                      )}
+                      {(
+                        Object.entries(PERSONALITY_LABELS) as [
+                          TutorPersonality,
+                          (typeof PERSONALITY_LABELS)[TutorPersonality],
+                        ][]
+                      ).map(([key, { emoji, label }]) => (
+                        <button
+                          key={key}
+                          onClick={() => updatePrefs({ personality: key })}
+                          className={cn(
+                            "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                            prefs.personality === key
+                              ? "bg-primary/10 text-primary font-medium"
+                              : "text-muted-foreground hover:bg-muted",
+                          )}
+                        >
+                          <span>{emoji}</span>
+                          <span>{label}</span>
+                          {prefs.personality === key && (
+                            <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                          )}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
                   {/* Explanation style */}
                   <div>
-                    <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">Explanation Style</p>
+                    <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Explanation Style
+                    </p>
                     <div className="grid grid-cols-1 gap-1">
-                      {(Object.entries(STYLE_LABELS) as [ExplanationStyle, typeof STYLE_LABELS[ExplanationStyle]][]).map(
-                        ([key, { emoji, label }]) => (
-                          <button
-                            key={key}
-                            onClick={() => updatePrefs({ style: key })}
-                            className={cn(
-                              "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
-                              prefs.style === key
-                                ? "bg-primary/10 text-primary font-medium"
-                                : "text-muted-foreground hover:bg-muted",
-                            )}
-                          >
-                            <span>{emoji}</span>
-                            <span>{label}</span>
-                            {prefs.style === key && (
-                              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
-                            )}
-                          </button>
-                        ),
-                      )}
+                      {(
+                        Object.entries(STYLE_LABELS) as [
+                          ExplanationStyle,
+                          (typeof STYLE_LABELS)[ExplanationStyle],
+                        ][]
+                      ).map(([key, { emoji, label }]) => (
+                        <button
+                          key={key}
+                          onClick={() => updatePrefs({ style: key })}
+                          className={cn(
+                            "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                            prefs.style === key
+                              ? "bg-primary/10 text-primary font-medium"
+                              : "text-muted-foreground hover:bg-muted",
+                          )}
+                        >
+                          <span>{emoji}</span>
+                          <span>{label}</span>
+                          {prefs.style === key && (
+                            <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                          )}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
                   {/* Language */}
                   <div>
-                    <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">Language</p>
+                    <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Language
+                    </p>
                     <div className="grid grid-cols-1 gap-1">
-                      {(Object.entries(LANGUAGE_LABELS) as [TutorLanguage, typeof LANGUAGE_LABELS[TutorLanguage]][]).map(
-                        ([key, { emoji, label }]) => (
-                          <button
-                            key={key}
-                            onClick={() => updatePrefs({ language: key })}
-                            className={cn(
-                              "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
-                              prefs.language === key
-                                ? "bg-primary/10 text-primary font-medium"
-                                : "text-muted-foreground hover:bg-muted",
-                            )}
-                          >
-                            <span>{emoji}</span>
-                            <span>{label}</span>
-                            {prefs.language === key && (
-                              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
-                            )}
-                          </button>
-                        ),
-                      )}
+                      {(
+                        Object.entries(LANGUAGE_LABELS) as [
+                          TutorLanguage,
+                          (typeof LANGUAGE_LABELS)[TutorLanguage],
+                        ][]
+                      ).map(([key, { emoji, label }]) => (
+                        <button
+                          key={key}
+                          onClick={() => updatePrefs({ language: key })}
+                          className={cn(
+                            "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                            prefs.language === key
+                              ? "bg-primary/10 text-primary font-medium"
+                              : "text-muted-foreground hover:bg-muted",
+                          )}
+                        >
+                          <span>{emoji}</span>
+                          <span>{label}</span>
+                          {prefs.language === key && (
+                            <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                          )}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
@@ -300,11 +317,7 @@ function TutorPage() {
                         : "bg-muted text-muted-foreground",
                     )}
                   >
-                    {m.role === "user" ? (
-                      <User className="h-4 w-4" />
-                    ) : (
-                      <Bot className="h-4 w-4" />
-                    )}
+                    {m.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                   </div>
                   <div
                     className={cn(

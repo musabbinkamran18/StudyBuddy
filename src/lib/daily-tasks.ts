@@ -14,6 +14,7 @@ export interface GenerateTasksInput {
   subjects: string[];
   difficulty: string;
   studentName: string;
+  weakTopics?: string[];
 }
 
 interface TasksCache {
@@ -84,6 +85,11 @@ export const generateDailyTasks = createServerFn({ method: "POST" })
       day: "numeric",
     });
 
+    const weakTopicClause =
+      data.weakTopics && data.weakTopics.length > 0
+        ? `- Weak areas to prioritise: ${data.weakTopics.join(", ")} (at least 2 tasks must target these)\n`
+        : "";
+
     const prompt = `You are a daily study task generator for a student learning app.
 
 Today is ${today}.
@@ -94,7 +100,7 @@ Student profile:
 - Curriculum: ${data.curriculum}
 - Enrolled subjects: ${data.subjects.join(", ")}
 - Difficulty preference: ${data.difficulty}
-
+${weakTopicClause}
 Generate exactly 4 specific daily study tasks for today. Rules:
 1. Each task must be specific and actionable — NOT vague (e.g. NOT "study math", YES "Solve 5 fraction problems where the denominators are different")
 2. Each task should take 10–20 minutes
@@ -137,7 +143,10 @@ Return ONLY a valid JSON array. No markdown. No explanation. Just the raw array:
       const raw = json.choices?.[0]?.message?.content?.trim() ?? "";
 
       // Strip markdown code fences if present
-      const cleaned = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+      const cleaned = raw
+        .replace(/^```(?:json)?\n?/, "")
+        .replace(/\n?```$/, "")
+        .trim();
       const tasks = JSON.parse(cleaned) as DailyTask[];
       if (!Array.isArray(tasks) || tasks.length === 0) throw new Error("bad shape");
 
@@ -150,10 +159,34 @@ Return ONLY a valid JSON array. No markdown. No explanation. Just the raw array:
 
 function getFallbackTasks(subjects: string[]): DailyTask[] {
   const pool: DailyTask[] = [
-    { id: "f1", subject: subjects[0] ?? "Mathematics", emoji: "🔢", title: "Solve 5 practice problems from your last topic", difficulty: "medium" },
-    { id: "f2", subject: subjects[1] ?? "English", emoji: "📝", title: "Write a short paragraph summarising what you learned yesterday", difficulty: "easy" },
-    { id: "f3", subject: subjects[2] ?? subjects[0] ?? "Science", emoji: "🔬", title: "Review your notes and write 3 key facts from memory", difficulty: "easy" },
-    { id: "f4", subject: subjects[0] ?? "Mathematics", emoji: "🧩", title: "Attempt one challenging past-paper question", difficulty: "hard" },
+    {
+      id: "f1",
+      subject: subjects[0] ?? "Mathematics",
+      emoji: "🔢",
+      title: "Solve 5 practice problems from your last topic",
+      difficulty: "medium",
+    },
+    {
+      id: "f2",
+      subject: subjects[1] ?? "English",
+      emoji: "📝",
+      title: "Write a short paragraph summarising what you learned yesterday",
+      difficulty: "easy",
+    },
+    {
+      id: "f3",
+      subject: subjects[2] ?? subjects[0] ?? "Science",
+      emoji: "🔬",
+      title: "Review your notes and write 3 key facts from memory",
+      difficulty: "easy",
+    },
+    {
+      id: "f4",
+      subject: subjects[0] ?? "Mathematics",
+      emoji: "🧩",
+      title: "Attempt one challenging past-paper question",
+      difficulty: "hard",
+    },
   ];
   return pool;
 }

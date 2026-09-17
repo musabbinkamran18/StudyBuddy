@@ -5,8 +5,7 @@ import type { Subject, Topic } from "./profile-data";
 /**
  * Backend mode detection.
  *
- * The template ships with a Lovable placeholder Supabase URL and no real
- * Supabase project behind it, so every network call fails. When the backend
+ * Without a connected Supabase project, every network call fails. When the backend
  * is unreachable we switch the whole app into "demo mode": auth and all data
  * live in localStorage and the app is fully usable with zero setup.
  */
@@ -20,6 +19,10 @@ export const DEMO_USER = {
 };
 
 let mode: "cloud" | "demo" | null = null;
+
+export function resetBackendMode(): void {
+  mode = null;
+}
 
 export async function backendMode(): Promise<"cloud" | "demo"> {
   if (mode) return mode;
@@ -135,9 +138,10 @@ export const DEMO_SUBJECTS: Subject[] = [
 /* --------------------------------------------------------------- demo topics */
 
 function demoTopics(code: string, names: string[]): Topic[] {
+  const subjectIdx = DEMO_SUBJECTS.findIndex((s) => s.code === code);
   return names.map((name, i) => ({
-    id: `20000000-0000-4000-8000-${i.toString().padStart(12, "0")}`,
-    subject_id: (DEMO_SUBJECTS.find((s) => s.code === code) ?? DEMO_SUBJECTS[0] ?? DEMO_SUBJECTS[0]!).id,
+    id: `20000000-0000-4000-8000-${((subjectIdx + 1) * 100 + i).toString().padStart(12, "0")}`,
+    subject_id: (DEMO_SUBJECTS.find((s) => s.code === code) ?? DEMO_SUBJECTS[0]!).id,
     name,
     slug: null,
     description: null,

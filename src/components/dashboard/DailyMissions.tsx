@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
 import { Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  loadDailyMissions,
-  syncMissionProgress,
-  claimMission,
-  type Mission,
-} from "@/lib/missions";
+import { loadDailyMissions, syncMissionProgress, claimMission, type Mission } from "@/lib/missions";
 import { earnCoins } from "@/lib/coins";
+import { loadRewards, saveRewards } from "@/lib/rewards";
 import { cn } from "@/lib/utils";
 
 interface DailyMissionsProps {
@@ -26,6 +22,10 @@ export function DailyMissions({ userId }: DailyMissionsProps) {
     const reward = claimMission(userId, missionId);
     if (!reward) return;
     earnCoins(userId, reward.coins);
+    if (reward.xp > 0) {
+      const stats = loadRewards(userId);
+      saveRewards(userId, { ...stats, xp: stats.xp + reward.xp });
+    }
     setClaimedAnim(missionId);
     setMissions(syncMissionProgress(userId));
     setTimeout(() => setClaimedAnim(null), 1500);

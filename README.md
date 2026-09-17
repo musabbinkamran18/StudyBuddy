@@ -1,4 +1,4 @@
-# Smart Study Engine
+# Smart Study Engine (StudyBuddy)
 
 Phrase 1: Data Model & Backend Architecture
 
@@ -10,19 +10,9 @@ Define schema for Practice Attempts, Mistakes, and Adaptive Learning Metrics (Ac
 
 Define schema for Chat History, Gamification (XP, Levels, Badges, Streaks), and AI Recommendations.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/d10ae853-235e-4de2-8d98-bf513bac77cb).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+You need Node.js (or bun) — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
 git clone <this-repository-url>
@@ -30,3 +20,9 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+By default the app has no Supabase project connected, so it runs in a fully
+offline "demo mode" backed by `localStorage` — see `src/lib/backend.ts`. To
+connect a real backend, set `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY`
+(client) and `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SERVICE_ROLE_KEY`
+(server) in your environment and apply the migrations under `supabase/migrations/`.

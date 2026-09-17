@@ -1,12 +1,8 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Check, Target, Flame, Star, Brain, Zap, ArrowRight } from "lucide-react";
 import { PieChart, Pie, Cell } from "recharts";
-import {
-  goalsFor,
-  achievementsFor,
-  loadRewards,
-  type RewardsStats,
-} from "@/lib/rewards";
+import { goalsFor, achievementsFor, loadRewards, type RewardsStats } from "@/lib/rewards";
 
 interface RightSidebarProps {
   userId: string;
@@ -81,10 +77,13 @@ export function RightSidebar({ userId, progress }: RightSidebarProps) {
       <div className="rounded-2xl border border-border bg-card p-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold tracking-tight text-foreground">Your Progress</h3>
-          <button className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary">
+          <Link
+            to="/profile"
+            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+          >
             View details
             <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </Link>
         </div>
 
         <div className="mt-4 flex items-center gap-3">
@@ -140,10 +139,13 @@ export function RightSidebar({ userId, progress }: RightSidebarProps) {
       <div className="rounded-2xl border border-border bg-card p-6">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold tracking-tight text-foreground">Achievements</h3>
-          <button className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary">
+          <Link
+            to="/achievements"
+            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+          >
             View all
             <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-4 gap-2">

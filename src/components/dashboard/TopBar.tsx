@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Flame, Bell } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -32,7 +33,9 @@ export function TopBar({ userName, streak = 0, coins, avatar }: TopBarProps) {
             {greeting}, {userName.split(" ")[0]}
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            {streak > 0 ? "Keep your streak alive — one session at a time." : "Start today's streak — one question at a time."}
+            {streak > 0
+              ? "Keep your streak alive — one session at a time."
+              : "Start today's streak — one question at a time."}
           </p>
         </div>
 
@@ -40,7 +43,9 @@ export function TopBar({ userName, streak = 0, coins, avatar }: TopBarProps) {
           {coins !== undefined && (
             <div className="flex items-center gap-1.5 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-3.5 py-1.5">
               <span className="text-sm">💎</span>
-              <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">{coins}</span>
+              <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">
+                {coins}
+              </span>
             </div>
           )}
 
@@ -55,11 +60,13 @@ export function TopBar({ userName, streak = 0, coins, avatar }: TopBarProps) {
             <Bell className="h-4 w-4" />
           </button>
 
-          <Avatar className="h-9 w-9 border border-border">
-            <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
-              {avatar || initials || "?"}
-            </AvatarFallback>
-          </Avatar>
+          <Link to="/profile">
+            <Avatar className="h-9 w-9 border border-border cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all">
+              <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                {avatar || initials || "?"}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </div>
     </header>

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, Activity as ActivityIcon, type LucideIcon } from "lucide-react";
 
 export interface ActivityItem {
@@ -21,10 +22,13 @@ export function RecentActivity({ activities = [] }: RecentActivityProps) {
       <div className="mb-5 flex items-center justify-between">
         <h3 className="text-xl font-semibold tracking-tight text-foreground">Recent Activity</h3>
         {!isEmpty && (
-          <button className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary">
+          <Link
+            to="/profile"
+            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+          >
             View all
             <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </Link>
         )}
       </div>
 

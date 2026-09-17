@@ -42,7 +42,10 @@ export function WeeklyChart({ userId }: WeeklyChartProps) {
                     {day.xp} XP
                   </div>
                 )}
-                <div className="w-full overflow-hidden rounded-t-md bg-muted" style={{ height: "100%" }}>
+                <div
+                  className="w-full overflow-hidden rounded-t-md bg-muted"
+                  style={{ height: "100%" }}
+                >
                   <div
                     className={cn(
                       "w-full rounded-t-md transition-all duration-500",

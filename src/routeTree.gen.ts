@@ -13,13 +13,21 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedBattleRouteImport } from './routes/_authenticated/battle'
+import { Route as AuthenticatedBlitzRouteImport } from './routes/_authenticated/blitz'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedFlashcardsRouteImport } from './routes/_authenticated/flashcards'
+import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedMatchRouteImport } from './routes/_authenticated/match'
 import { Route as AuthenticatedMistakesRouteImport } from './routes/_authenticated/mistakes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPracticeRouteImport } from './routes/_authenticated/practice'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
+import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated/skills'
+import { Route as AuthenticatedStoryRouteImport } from './routes/_authenticated/story'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
+import { Route as AuthenticatedBattleCodeRouteImport } from './routes/_authenticated/battle.$code'
 import { Route as AuthenticatedLearnCodeRouteImport } from './routes/_authenticated/learn.$code'
 import { Route as AuthenticatedSubjectCodeRouteImport } from './routes/_authenticated/subject.$code'
 
@@ -43,9 +51,35 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBattleRoute = AuthenticatedBattleRouteImport.update({
+  id: '/battle',
+  path: '/battle',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBlitzRoute = AuthenticatedBlitzRouteImport.update({
+  id: '/blitz',
+  path: '/blitz',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFlashcardsRoute = AuthenticatedFlashcardsRouteImport.update({
+  id: '/flashcards',
+  path: '/flashcards',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLeaderboardRoute =
+  AuthenticatedLeaderboardRouteImport.update({
+    id: '/leaderboard',
+    path: '/leaderboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMatchRoute = AuthenticatedMatchRouteImport.update({
+  id: '/match',
+  path: '/match',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMistakesRoute = AuthenticatedMistakesRouteImport.update({
@@ -73,10 +107,25 @@ const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSkillsRoute = AuthenticatedSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStoryRoute = AuthenticatedStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTutorRoute = AuthenticatedTutorRouteImport.update({
   id: '/tutor',
   path: '/tutor',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBattleCodeRoute = AuthenticatedBattleCodeRouteImport.update({
+  id: '/$code',
+  path: '/$code',
+  getParentRoute: () => AuthenticatedBattleRoute,
 } as any)
 const AuthenticatedLearnCodeRoute = AuthenticatedLearnCodeRouteImport.update({
   id: '/learn/$code',
@@ -94,13 +143,21 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/battle': typeof AuthenticatedBattleRouteWithChildren
+  '/blitz': typeof AuthenticatedBlitzRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/flashcards': typeof AuthenticatedFlashcardsRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/match': typeof AuthenticatedMatchRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/practice': typeof AuthenticatedPracticeRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shop': typeof AuthenticatedShopRoute
+  '/skills': typeof AuthenticatedSkillsRoute
+  '/story': typeof AuthenticatedStoryRoute
   '/tutor': typeof AuthenticatedTutorRoute
+  '/battle/$code': typeof AuthenticatedBattleCodeRoute
   '/learn/$code': typeof AuthenticatedLearnCodeRoute
   '/subject/$code': typeof AuthenticatedSubjectCodeRoute
 }
@@ -108,13 +165,21 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/battle': typeof AuthenticatedBattleRouteWithChildren
+  '/blitz': typeof AuthenticatedBlitzRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/flashcards': typeof AuthenticatedFlashcardsRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/match': typeof AuthenticatedMatchRoute
   '/mistakes': typeof AuthenticatedMistakesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/practice': typeof AuthenticatedPracticeRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shop': typeof AuthenticatedShopRoute
+  '/skills': typeof AuthenticatedSkillsRoute
+  '/story': typeof AuthenticatedStoryRoute
   '/tutor': typeof AuthenticatedTutorRoute
+  '/battle/$code': typeof AuthenticatedBattleCodeRoute
   '/learn/$code': typeof AuthenticatedLearnCodeRoute
   '/subject/$code': typeof AuthenticatedSubjectCodeRoute
 }
@@ -124,13 +189,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
+  '/_authenticated/battle': typeof AuthenticatedBattleRouteWithChildren
+  '/_authenticated/blitz': typeof AuthenticatedBlitzRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/flashcards': typeof AuthenticatedFlashcardsRoute
+  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/_authenticated/match': typeof AuthenticatedMatchRoute
   '/_authenticated/mistakes': typeof AuthenticatedMistakesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/practice': typeof AuthenticatedPracticeRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shop': typeof AuthenticatedShopRoute
+  '/_authenticated/skills': typeof AuthenticatedSkillsRoute
+  '/_authenticated/story': typeof AuthenticatedStoryRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
+  '/_authenticated/battle/$code': typeof AuthenticatedBattleCodeRoute
   '/_authenticated/learn/$code': typeof AuthenticatedLearnCodeRoute
   '/_authenticated/subject/$code': typeof AuthenticatedSubjectCodeRoute
 }
@@ -140,13 +213,21 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/achievements'
+    | '/battle'
+    | '/blitz'
     | '/dashboard'
+    | '/flashcards'
+    | '/leaderboard'
+    | '/match'
     | '/mistakes'
     | '/onboarding'
     | '/practice'
     | '/profile'
     | '/shop'
+    | '/skills'
+    | '/story'
     | '/tutor'
+    | '/battle/$code'
     | '/learn/$code'
     | '/subject/$code'
   fileRoutesByTo: FileRoutesByTo
@@ -154,13 +235,21 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/achievements'
+    | '/battle'
+    | '/blitz'
     | '/dashboard'
+    | '/flashcards'
+    | '/leaderboard'
+    | '/match'
     | '/mistakes'
     | '/onboarding'
     | '/practice'
     | '/profile'
     | '/shop'
+    | '/skills'
+    | '/story'
     | '/tutor'
+    | '/battle/$code'
     | '/learn/$code'
     | '/subject/$code'
   id:
@@ -169,13 +258,21 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/achievements'
+    | '/_authenticated/battle'
+    | '/_authenticated/blitz'
     | '/_authenticated/dashboard'
+    | '/_authenticated/flashcards'
+    | '/_authenticated/leaderboard'
+    | '/_authenticated/match'
     | '/_authenticated/mistakes'
     | '/_authenticated/onboarding'
     | '/_authenticated/practice'
     | '/_authenticated/profile'
     | '/_authenticated/shop'
+    | '/_authenticated/skills'
+    | '/_authenticated/story'
     | '/_authenticated/tutor'
+    | '/_authenticated/battle/$code'
     | '/_authenticated/learn/$code'
     | '/_authenticated/subject/$code'
   fileRoutesById: FileRoutesById
@@ -216,11 +313,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/battle': {
+      id: '/_authenticated/battle'
+      path: '/battle'
+      fullPath: '/battle'
+      preLoaderRoute: typeof AuthenticatedBattleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/blitz': {
+      id: '/_authenticated/blitz'
+      path: '/blitz'
+      fullPath: '/blitz'
+      preLoaderRoute: typeof AuthenticatedBlitzRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/flashcards': {
+      id: '/_authenticated/flashcards'
+      path: '/flashcards'
+      fullPath: '/flashcards'
+      preLoaderRoute: typeof AuthenticatedFlashcardsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leaderboard': {
+      id: '/_authenticated/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/match': {
+      id: '/_authenticated/match'
+      path: '/match'
+      fullPath: '/match'
+      preLoaderRoute: typeof AuthenticatedMatchRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mistakes': {
@@ -258,12 +390,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/skills': {
+      id: '/_authenticated/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof AuthenticatedSkillsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/story': {
+      id: '/_authenticated/story'
+      path: '/story'
+      fullPath: '/story'
+      preLoaderRoute: typeof AuthenticatedStoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tutor': {
       id: '/_authenticated/tutor'
       path: '/tutor'
       fullPath: '/tutor'
       preLoaderRoute: typeof AuthenticatedTutorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/battle/$code': {
+      id: '/_authenticated/battle/$code'
+      path: '/$code'
+      fullPath: '/battle/$code'
+      preLoaderRoute: typeof AuthenticatedBattleCodeRouteImport
+      parentRoute: typeof AuthenticatedBattleRoute
     }
     '/_authenticated/learn/$code': {
       id: '/_authenticated/learn/$code'
@@ -282,14 +435,32 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedBattleRouteChildren {
+  AuthenticatedBattleCodeRoute: typeof AuthenticatedBattleCodeRoute
+}
+
+const AuthenticatedBattleRouteChildren: AuthenticatedBattleRouteChildren = {
+  AuthenticatedBattleCodeRoute: AuthenticatedBattleCodeRoute,
+}
+
+const AuthenticatedBattleRouteWithChildren =
+  AuthenticatedBattleRoute._addFileChildren(AuthenticatedBattleRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
+  AuthenticatedBattleRoute: typeof AuthenticatedBattleRouteWithChildren
+  AuthenticatedBlitzRoute: typeof AuthenticatedBlitzRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFlashcardsRoute: typeof AuthenticatedFlashcardsRoute
+  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
+  AuthenticatedMatchRoute: typeof AuthenticatedMatchRoute
   AuthenticatedMistakesRoute: typeof AuthenticatedMistakesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPracticeRoute: typeof AuthenticatedPracticeRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedShopRoute: typeof AuthenticatedShopRoute
+  AuthenticatedSkillsRoute: typeof AuthenticatedSkillsRoute
+  AuthenticatedStoryRoute: typeof AuthenticatedStoryRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
   AuthenticatedLearnCodeRoute: typeof AuthenticatedLearnCodeRoute
   AuthenticatedSubjectCodeRoute: typeof AuthenticatedSubjectCodeRoute
@@ -297,12 +468,19 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
+  AuthenticatedBattleRoute: AuthenticatedBattleRouteWithChildren,
+  AuthenticatedBlitzRoute: AuthenticatedBlitzRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFlashcardsRoute: AuthenticatedFlashcardsRoute,
+  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
+  AuthenticatedMatchRoute: AuthenticatedMatchRoute,
   AuthenticatedMistakesRoute: AuthenticatedMistakesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPracticeRoute: AuthenticatedPracticeRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedShopRoute: AuthenticatedShopRoute,
+  AuthenticatedSkillsRoute: AuthenticatedSkillsRoute,
+  AuthenticatedStoryRoute: AuthenticatedStoryRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
   AuthenticatedLearnCodeRoute: AuthenticatedLearnCodeRoute,
   AuthenticatedSubjectCodeRoute: AuthenticatedSubjectCodeRoute,

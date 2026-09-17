@@ -131,18 +131,20 @@ export function useStreakFreeze(userId: string): boolean {
 }
 
 // Returns null if already claimed today; returns the reward if just claimed
-export function checkAndClaimLoginReward(
-  userId: string,
-): { claimed: boolean; reward?: LoginReward; nextDay: number } {
+export function checkAndClaimLoginReward(userId: string): {
+  claimed: boolean;
+  reward?: LoginReward;
+  nextDay: number;
+} {
   const state = loadCoinState(userId);
   const today = todayKey();
 
   if (state.lastLoginClaimDate === today) {
-    return { claimed: false, nextDay: ((state.loginCycleDay) % 7) + 1 };
+    return { claimed: false, nextDay: (state.loginCycleDay % 7) + 1 };
   }
 
   // Advance cycle (0-6 maps to day 1-7)
-  const nextCycleDay = (state.loginCycleDay) % 7;
+  const nextCycleDay = state.loginCycleDay % 7;
   const reward = LOGIN_REWARDS[nextCycleDay]!;
 
   state.loginCycleDay = (nextCycleDay + 1) % 7;

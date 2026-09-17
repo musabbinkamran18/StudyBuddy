@@ -34,10 +34,7 @@ export function loadExtendedStats(userId: string): ExtendedStats {
   return { ...DEFAULT };
 }
 
-export function updateExtendedStats(
-  userId: string,
-  delta: Partial<ExtendedStats>,
-): ExtendedStats {
+export function updateExtendedStats(userId: string, delta: Partial<ExtendedStats>): ExtendedStats {
   const current = loadExtendedStats(userId);
   const next: ExtendedStats = { ...current };
   for (const k of Object.keys(delta) as (keyof ExtendedStats)[]) {

@@ -32,14 +32,50 @@ export interface LeaderboardEntry {
 }
 
 const FAKE_NAMES = [
-  "Aisha K.", "Omar B.", "Sara M.", "Ali R.", "Zara N.",
-  "Hassan A.", "Layla Q.", "Bilal T.", "Noor F.", "Yusuf H.",
-  "Fatima J.", "Ahmed S.", "Mia C.", "Noah W.", "Emma L.",
-  "Lucas P.", "Olivia D.", "Ethan G.", "Ava R.", "James M.",
+  "Aisha K.",
+  "Omar B.",
+  "Sara M.",
+  "Ali R.",
+  "Zara N.",
+  "Hassan A.",
+  "Layla Q.",
+  "Bilal T.",
+  "Noor F.",
+  "Yusuf H.",
+  "Fatima J.",
+  "Ahmed S.",
+  "Mia C.",
+  "Noah W.",
+  "Emma L.",
+  "Lucas P.",
+  "Olivia D.",
+  "Ethan G.",
+  "Ava R.",
+  "James M.",
 ];
 
-const AVATARS = ["😺", "🐼", "🦊", "🐯", "🐸", "🦁", "🐧", "🦄", "🐨", "🐙",
-  "🦋", "🐝", "🦅", "🐬", "🦉", "🦊", "🐢", "🦋", "🦩", "🐻"];
+const AVATARS = [
+  "😺",
+  "🐼",
+  "🦊",
+  "🐯",
+  "🐸",
+  "🦁",
+  "🐧",
+  "🦄",
+  "🐨",
+  "🐙",
+  "🦋",
+  "🐝",
+  "🦅",
+  "🐬",
+  "🦉",
+  "🦊",
+  "🐢",
+  "🦋",
+  "🦩",
+  "🐻",
+];
 
 // Seed based on week number so the leaderboard stays consistent within a week
 function weekSeed() {
@@ -67,13 +103,14 @@ export function generateWeeklyLeaderboard(
 
   for (let i = 0; i < count; i++) {
     let name: string;
+    let attempt = 0;
     do {
-      name = FAKE_NAMES[seededRand(seed + i * 3, 0, FAKE_NAMES.length - 1)]!;
-    } while (usedNames.has(name));
+      name = FAKE_NAMES[seededRand(seed + i * 3 + attempt * 97, 0, FAKE_NAMES.length - 1)]!;
+      attempt++;
+    } while (usedNames.has(name) && attempt < FAKE_NAMES.length * 2);
     usedNames.add(name);
 
     // Spread XP around the user's value: some above, some below
-    const spread = seededRand(seed + i * 7, 0, 100);
     let xp: number;
     if (i < 4) {
       // Top players — clearly ahead
@@ -109,16 +146,141 @@ export function generateWeeklyLeaderboard(
   return all.map((entry, i) => ({ ...entry, rank: i + 1 }));
 }
 
-export function getWeeklyXp(userId: string): number {
-  // Sum XP earned this week from daily activity records
-  // For now: use the rewards.ts data as an approximation
+/** Fetch real leaderboard from Supabase. Falls back to generated fake data in demo mode. */
+export async function fetchLeaderboard(
+  currentUserId: string,
+  fallbackUserName: string,
+  fallbackAvatar: string,
+  fallbackWeeklyXp: number,
+  fallbackTotalXp: number,
+): Promise<{ weekly: LeaderboardEntry[]; allTime: LeaderboardEntry[] }> {
   try {
-    const raw = localStorage.getItem(`rewards:${userId}`);
+    const { supabase } = await import("@/integrations/supabase/client");
+
+    const [gsRes, profRes] = await Promise.all([
+      supabase.from("game_state").select("user_id, rewards, avatar, study_log"),
+      supabase
+        .from("student_profiles")
+        .select("user_id, full_name")
+        .eq("onboarding_completed", true),
+    ]);
+
+    const rows = gsRes.data;
+    if (!rows || rows.length === 0) throw new Error("empty");
+
+    const nameMap = new Map<string, string>();
+    (profRes.data ?? []).forEach((p) => nameMap.set(p.user_id, p.full_name));
+
+    type Raw = { userId: string; name: string; avatar: string; totalXp: number; weekXp: number; isCurrentUser: boolean };
+
+    const today = new Date();
+    const last7: string[] = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      return d.toISOString().slice(0, 10);
+    });
+
+    const entries: Raw[] = rows.map((gs) => {
+      const rwd = gs.rewards as { xp?: number } | null;
+      const totalXp = rwd?.xp ?? 0;
+
+      const log = gs.study_log as Record<string, { xp?: number } | undefined> | null;
+      const weekXp = log
+        ? last7.reduce((sum, k) => sum + (log[k]?.xp ?? 0), 0)
+        : 0;
+
+      return {
+        userId: gs.user_id,
+        name: nameMap.get(gs.user_id) ?? "Anonymous",
+        avatar: gs.avatar || "⭐",
+        totalXp,
+        weekXp,
+        isCurrentUser: gs.user_id === currentUserId,
+      };
+    });
+
+    const toBoard = (sorted: Raw[]): LeaderboardEntry[] =>
+      sorted.map((e, i) => ({
+        rank: i + 1,
+        name: e.name,
+        avatar: e.avatar,
+        weeklyXp: e.totalXp, // repurposed as the display value; callers pick the right sort
+        isCurrentUser: e.isCurrentUser,
+      }));
+
+    const weekly = toBoard(
+      [...entries].sort((a, b) => b.weekXp - a.weekXp).map((e) => ({ ...e, totalXp: e.weekXp })),
+    );
+    const allTime = toBoard([...entries].sort((a, b) => b.totalXp - a.totalXp));
+
+    return { weekly, allTime };
+  } catch {
+    return {
+      weekly: generateWeeklyLeaderboard(fallbackWeeklyXp, fallbackUserName, fallbackAvatar),
+      allTime: generateAllTimeLeaderboard(fallbackTotalXp, fallbackUserName, fallbackAvatar),
+    };
+  }
+}
+
+export function getWeeklyXp(userId: string): number {
+  try {
+    const raw = localStorage.getItem(`study-log:${userId}`);
     if (!raw) return 0;
-    const data = JSON.parse(raw) as { xp?: number };
-    // Weekly XP = rough weekly estimate (last ~7 sessions)
-    return Math.min(data.xp ?? 0, data.xp ?? 0);
+    const log = JSON.parse(raw) as Record<string, { xp?: number }>;
+    const today = new Date();
+    let total = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      total += log[key]?.xp ?? 0;
+    }
+    return total;
   } catch {
     return 0;
   }
+}
+
+export function generateAllTimeLeaderboard(
+  userTotalXp: number,
+  userName: string,
+  userAvatar = "⭐",
+): LeaderboardEntry[] {
+  const seed = weekSeed() + 9999;
+  const count = 14;
+  const fakes: { name: string; avatar: string; weeklyXp: number }[] = [];
+  const usedNames = new Set<string>();
+
+  for (let i = 0; i < count; i++) {
+    let name: string;
+    let attempt = 0;
+    do {
+      name = FAKE_NAMES[seededRand(seed + i * 7 + attempt * 53, 0, FAKE_NAMES.length - 1)]!;
+      attempt++;
+    } while (usedNames.has(name) && attempt < FAKE_NAMES.length * 2);
+    usedNames.add(name);
+
+    let xp: number;
+    if (i < 3) {
+      xp = userTotalXp + seededRand(seed + i * 23, 500, 3000);
+    } else if (i >= count - 3) {
+      xp = Math.max(0, userTotalXp - seededRand(seed + i * 31, 300, 1500));
+    } else {
+      const delta = seededRand(seed + i * 41, -800, 800);
+      xp = Math.max(0, userTotalXp + delta);
+    }
+
+    fakes.push({
+      name,
+      avatar: AVATARS[seededRand(seed + i * 9, 0, AVATARS.length - 1)]!,
+      weeklyXp: xp,
+    });
+  }
+
+  const all = [
+    ...fakes,
+    { name: userName, avatar: userAvatar, weeklyXp: userTotalXp, isCurrentUser: true },
+  ];
+  all.sort((a, b) => b.weeklyXp - a.weeklyXp);
+  return all.map((entry, i) => ({ ...entry, rank: i + 1 }));
 }

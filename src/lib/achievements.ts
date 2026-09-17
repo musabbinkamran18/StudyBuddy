@@ -3,15 +3,7 @@ import type { ExtendedStats } from "@/lib/extended-stats";
 import { earnCoins, type CoinState } from "@/lib/coins";
 
 export type AchievementCategory =
-  | "streak"
-  | "xp"
-  | "questions"
-  | "lessons"
-  | "boss"
-  | "mastery"
-  | "perfect"
-  | "coins"
-  | "missions";
+  "streak" | "xp" | "questions" | "lessons" | "boss" | "mastery" | "perfect" | "coins" | "missions";
 
 export interface Achievement {
   id: string;
@@ -21,7 +13,11 @@ export interface Achievement {
   category: AchievementCategory;
   coinReward: number;
   check: (r: RewardsStats, e: ExtendedStats, c: CoinState) => boolean;
-  progress?: (r: RewardsStats, e: ExtendedStats, c: CoinState) => { current: number; target: number };
+  progress?: (
+    r: RewardsStats,
+    e: ExtendedStats,
+    c: CoinState,
+  ) => { current: number; target: number };
 }
 
 export const ALL_ACHIEVEMENTS: Achievement[] = [

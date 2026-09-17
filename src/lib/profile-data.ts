@@ -89,7 +89,11 @@ export async function fetchMyProfile(userId: string): Promise<{
 
   return {
     exists: true,
-    completed: row.onboarding_completed,
+    // A row can be marked complete with zero subjects if an earlier save was
+    // interrupted between writing the profile and the subjects — treat that as
+    // incomplete so the user is routed back to onboarding instead of getting
+    // stuck with an empty subject picker everywhere else in the app.
+    completed: row.onboarding_completed && subjectIds.length > 0,
     draft: {
       full_name: row.full_name ?? "",
       age: row.age == null ? "" : String(row.age),
@@ -110,22 +114,10 @@ export async function saveMyProfile(userId: string, draft: LearningProfileDraft)
     return;
   }
 
-  const { error: profileError } = await supabase.from("student_profiles").upsert(
-    {
-      user_id: userId,
-      full_name: draft.full_name.trim(),
-      age: draft.age === "" ? null : Number(draft.age),
-      grade: draft.grade,
-      curriculum: draft.curriculum,
-      seriousness: draft.seriousness,
-      study_goals: draft.study_goals.trim() || null,
-      target_daily_minutes: draft.target_daily_minutes,
-      onboarding_completed: true,
-    },
-    { onConflict: "user_id" },
-  );
-  if (profileError) throw profileError;
-
+  // Subjects are written first and must succeed before the profile is marked
+  // "completed" — otherwise a failure here would leave onboarding_completed=true
+  // with zero subjects, and the onboarding redirect would never let the user back
+  // in to fix it (see the subjectIds.length check on fetchMyProfile's callers).
   const { error: deleteError } = await supabase
     .from("student_subjects")
     .delete()
@@ -143,6 +135,22 @@ export async function saveMyProfile(userId: string, draft: LearningProfileDraft)
     );
     if (insertError) throw insertError;
   }
+
+  const { error: profileError } = await supabase.from("student_profiles").upsert(
+    {
+      user_id: userId,
+      full_name: draft.full_name.trim(),
+      age: draft.age === "" ? null : Number(draft.age),
+      grade: draft.grade,
+      curriculum: draft.curriculum,
+      seriousness: draft.seriousness,
+      study_goals: draft.study_goals.trim() || null,
+      target_daily_minutes: draft.target_daily_minutes,
+      onboarding_completed: true,
+    },
+    { onConflict: "user_id" },
+  );
+  if (profileError) throw profileError;
 
   await supabase.from("profiles").update({ display_name: draft.full_name.trim() }).eq("id", userId);
 }

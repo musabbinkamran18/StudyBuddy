@@ -51,7 +51,11 @@ export function recordSessionCompleted(userId: string, minutes: number): Rewards
   const yesterday = todayKey(new Date(Date.now() - 86_400_000));
 
   const streak =
-    stats.lastActiveDay === yesterday ? stats.streak + 1 : stats.lastActiveDay === today ? stats.streak : 1;
+    stats.lastActiveDay === yesterday
+      ? stats.streak + 1
+      : stats.lastActiveDay === today
+        ? stats.streak
+        : 1;
 
   const next: RewardsStats = {
     ...stats,
@@ -118,7 +122,8 @@ export function achievementsFor(stats: RewardsStats): AchievementItem[] {
       id: "streak-7",
       icon: Flame,
       label: "7 Day Streak",
-      tile: stats.streak >= 7 ? "bg-primary/15 ring-primary/30" : "bg-muted ring-muted-foreground/15",
+      tile:
+        stats.streak >= 7 ? "bg-primary/15 ring-primary/30" : "bg-muted ring-muted-foreground/15",
       tint: stats.streak >= 7 ? "text-primary" : "text-muted-foreground/70",
       locked: stats.streak < 7,
     },
@@ -126,7 +131,10 @@ export function achievementsFor(stats: RewardsStats): AchievementItem[] {
       id: "first-topic",
       icon: Star,
       label: "First Topic Mastered",
-      tile: stats.topicsMastered >= 1 ? "bg-primary/15 ring-primary/30" : "bg-muted ring-muted-foreground/15",
+      tile:
+        stats.topicsMastered >= 1
+          ? "bg-primary/15 ring-primary/30"
+          : "bg-muted ring-muted-foreground/15",
       tint: stats.topicsMastered >= 1 ? "text-primary" : "text-muted-foreground/70",
       locked: stats.topicsMastered < 1,
     },
@@ -142,7 +150,10 @@ export function achievementsFor(stats: RewardsStats): AchievementItem[] {
       id: "perfect-10",
       icon: Zap,
       label: "10 Perfect Questions",
-      tile: stats.bestStreak >= 10 ? "bg-primary/15 ring-primary/30" : "bg-muted ring-muted-foreground/15",
+      tile:
+        stats.bestStreak >= 10
+          ? "bg-primary/15 ring-primary/30"
+          : "bg-muted ring-muted-foreground/15",
       tint: stats.bestStreak >= 10 ? "text-primary" : "text-muted-foreground/70",
       locked: stats.bestStreak < 10,
     },

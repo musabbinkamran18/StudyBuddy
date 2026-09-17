@@ -38,7 +38,7 @@ import {
 import { toast } from "sonner";
 import { recordSessionCompleted, recordTopicMastered, loadRewards } from "@/lib/rewards";
 import { loadAvatar } from "@/lib/avatar";
-import { earnCoins, hasXpBoost, useXpBoost, loadCoinState } from "@/lib/coins";
+import { earnCoins, hasXpBoost, useXpBoost as consumeXpBoost, loadCoinState } from "@/lib/coins";
 import { trackActivity } from "@/lib/missions";
 import { updateExtendedStats } from "@/lib/extended-stats";
 import { checkAndUnlockAchievements, markNotified } from "@/lib/achievements";
@@ -172,7 +172,7 @@ function LearnPage() {
       generatePracticeQuestions(input),
     onSuccess: (result, variables) => {
       const boostActive = hasXpBoost(user.id);
-      if (boostActive) useXpBoost(user.id);
+      if (boostActive) consumeXpBoost(user.id);
       setSessionState({
         questions: result.questions,
         current: 0,
@@ -260,17 +260,18 @@ function LearnPage() {
     }
 
     if (newHearts <= 0) {
-      setSessionState((s) =>
-        s && {
-          ...s,
-          hearts: 0,
-          xpEarned: newXp,
-          correctCount: newCorrect,
-          mistakes: newMistakes,
-          consecutiveCorrect: newConsecCorrect,
-          consecutiveWrong: newConsecWrong,
-          currentDifficulty: newDiff,
-        },
+      setSessionState(
+        (s) =>
+          s && {
+            ...s,
+            hearts: 0,
+            xpEarned: newXp,
+            correctCount: newCorrect,
+            mistakes: newMistakes,
+            consecutiveCorrect: newConsecCorrect,
+            consecutiveWrong: newConsecWrong,
+            currentDifficulty: newDiff,
+          },
       );
       setScreen("failed");
       return;
@@ -298,8 +299,7 @@ function LearnPage() {
       recordSessionCompleted(user.id, Math.round(sessionCount(mode) * 0.5));
 
       // Award coins
-      const coinReward =
-        mode === "boss" ? 25 : mode === "practice" ? 15 : 10;
+      const coinReward = mode === "boss" ? 25 : mode === "practice" ? 15 : 10;
       const perfectCoinBonus = newMistakes.length === 0 ? 10 : 0;
       earnCoins(user.id, coinReward + perfectCoinBonus);
 
@@ -326,41 +326,51 @@ function LearnPage() {
       });
       const freshRewards = loadRewards(user.id);
       const freshCoins = loadCoinState(user.id);
-      const newAchievements = checkAndUnlockAchievements(user.id, freshRewards, updatedExtended, freshCoins);
+      const newAchievements = checkAndUnlockAchievements(
+        user.id,
+        freshRewards,
+        updatedExtended,
+        freshCoins,
+      );
       newAchievements.forEach((a) =>
         toast.success(`${a.emoji} ${a.label}`, { description: a.description }),
       );
       if (newAchievements.length > 0)
-        markNotified(user.id, newAchievements.map((a) => a.id));
+        markNotified(
+          user.id,
+          newAchievements.map((a) => a.id),
+        );
 
-      setSessionState((s) =>
-        s && {
-          ...s,
-          hearts: newHearts,
-          xpEarned: totalXp,
-          correctCount: newCorrect,
-          mistakes: newMistakes,
-          consecutiveCorrect: newConsecCorrect,
-          consecutiveWrong: newConsecWrong,
-          currentDifficulty: newDiff,
-        },
+      setSessionState(
+        (s) =>
+          s && {
+            ...s,
+            hearts: newHearts,
+            xpEarned: totalXp,
+            correctCount: newCorrect,
+            mistakes: newMistakes,
+            consecutiveCorrect: newConsecCorrect,
+            consecutiveWrong: newConsecWrong,
+            currentDifficulty: newDiff,
+          },
       );
       setScreen("summary");
     } else {
-      setSessionState((s) =>
-        s && {
-          ...s,
-          current: current + 1,
-          hearts: newHearts,
-          xpEarned: newXp,
-          correctCount: newCorrect,
-          mistakes: newMistakes,
-          selected: null,
-          isCorrect: null,
-          consecutiveCorrect: newConsecCorrect,
-          consecutiveWrong: newConsecWrong,
-          currentDifficulty: newDiff,
-        },
+      setSessionState(
+        (s) =>
+          s && {
+            ...s,
+            current: current + 1,
+            hearts: newHearts,
+            xpEarned: newXp,
+            correctCount: newCorrect,
+            mistakes: newMistakes,
+            selected: null,
+            isCorrect: null,
+            consecutiveCorrect: newConsecCorrect,
+            consecutiveWrong: newConsecWrong,
+            currentDifficulty: newDiff,
+          },
       );
       setScreen("question");
     }
@@ -663,8 +673,7 @@ function TopicNode({
       className={cn(
         "rounded-2xl border p-5 transition-all",
         status === "done" && "border-green-500/40 bg-green-500/5",
-        status === "active" &&
-          "border-primary/40 bg-primary/5 ring-2 ring-primary/15",
+        status === "active" && "border-primary/40 bg-primary/5 ring-2 ring-primary/15",
         status === "locked" && "border-muted/80 opacity-60",
       )}
     >
@@ -703,11 +712,7 @@ function TopicNode({
           </div>
           {isUnlocked && (
             <div className="text-muted-foreground">
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </div>
           )}
         </div>
@@ -733,7 +738,16 @@ function TopicNode({
                 <div className="flex flex-col items-center gap-1.5 flex-1">
                   {/* Step circle */}
                   <button
-                    onClick={step.unlocked && !step.done ? () => onStartSession({ mode: step.id, topicId: topic.id, topicName: topic.name }) : undefined}
+                    onClick={
+                      step.unlocked && !step.done
+                        ? () =>
+                            onStartSession({
+                              mode: step.id,
+                              topicId: topic.id,
+                              topicName: topic.name,
+                            })
+                        : undefined
+                    }
                     disabled={!step.unlocked || step.done}
                     className={cn(
                       "flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold transition-transform",
@@ -856,8 +870,16 @@ interface QuestionViewProps {
 }
 
 function QuestionView({ sessionConfig, sessionState, isBoss, onAnswer }: QuestionViewProps) {
-  const { questions, current, hearts, xpEarned, consecutiveCorrect, consecutiveWrong, currentDifficulty, xpMultiplier } =
-    sessionState;
+  const {
+    questions,
+    current,
+    hearts,
+    xpEarned,
+    consecutiveCorrect,
+    consecutiveWrong,
+    currentDifficulty,
+    xpMultiplier,
+  } = sessionState;
   const q = questions[current];
   const total = questions.length;
   if (!q) return null;
@@ -900,9 +922,7 @@ function QuestionView({ sessionConfig, sessionState, isBoss, onAnswer }: Questio
               <span className={isBoss ? "text-red-200" : "text-muted-foreground"}>
                 Question {current + 1} of {total}
               </span>
-              {diffLabel && (
-                <span className="text-xs font-medium text-amber-500">{diffLabel}</span>
-              )}
+              {diffLabel && <span className="text-xs font-medium text-amber-500">{diffLabel}</span>}
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
               <div
@@ -922,9 +942,7 @@ function QuestionView({ sessionConfig, sessionState, isBoss, onAnswer }: Questio
                 key={i}
                 className={cn(
                   "h-4 w-4",
-                  i < hearts
-                    ? "fill-red-500 text-red-500"
-                    : "fill-muted text-muted-foreground/30",
+                  i < hearts ? "fill-red-500 text-red-500" : "fill-muted text-muted-foreground/30",
                 )}
               />
             ))}
@@ -974,9 +992,7 @@ function QuestionView({ sessionConfig, sessionState, isBoss, onAnswer }: Questio
               <span
                 className={cn(
                   "mr-3 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",
-                  isBoss
-                    ? "bg-red-500/20 text-red-300"
-                    : "bg-muted text-muted-foreground",
+                  isBoss ? "bg-red-500/20 text-red-300" : "bg-muted text-muted-foreground",
                 )}
               >
                 {String.fromCharCode(65 + i)}
@@ -1016,9 +1032,7 @@ function FeedbackView({ sessionConfig, sessionState, isBoss, onContinue }: Feedb
       <div
         className={cn(
           "rounded-2xl border p-6",
-          correct
-            ? "border-green-500/30 bg-green-500/10"
-            : "border-red-500/30 bg-red-500/10",
+          correct ? "border-green-500/30 bg-green-500/10" : "border-red-500/30 bg-red-500/10",
         )}
       >
         <div className="flex items-center gap-3 mb-4">
@@ -1031,7 +1045,12 @@ function FeedbackView({ sessionConfig, sessionState, isBoss, onContinue }: Feedb
             {correct ? "✓" : "✗"}
           </div>
           <div>
-            <p className={cn("font-bold text-lg", correct ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400")}>
+            <p
+              className={cn(
+                "font-bold text-lg",
+                correct ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400",
+              )}
+            >
               {correct ? "Correct!" : "Incorrect"}
             </p>
             {correct && (

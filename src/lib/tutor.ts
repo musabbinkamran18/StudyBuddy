@@ -35,23 +35,22 @@ function buildSystemPrompt(data: TutorChatInput): string {
   };
 
   const styleInstructions: Record<ExplanationStyle, string> = {
-    short:      "Keep every reply to 1–2 sentences maximum. Be very concise.",
-    detailed:   "Give thorough explanations with background context where it helps understanding.",
+    short: "Keep every reply to 1–2 sentences maximum. Be very concise.",
+    detailed: "Give thorough explanations with background context where it helps understanding.",
     stepbystep: "Always break things into clear numbered steps.",
-    examples:   "Always start with a concrete real-world example before explaining the concept.",
-    analogy:    "Use real-world analogies and visual descriptions to explain every concept.",
+    examples: "Always start with a concrete real-world example before explaining the concept.",
+    analogy: "Use real-world analogies and visual descriptions to explain every concept.",
   };
 
   const languageInstructions: Record<TutorLanguage, string> = {
     english: "Respond in clear, standard English.",
-    urdu:    "Respond entirely in Urdu script (اردو). Do not use Roman Urdu.",
-    simple:  "Respond in very simple, basic English. Avoid long or complex words.",
-    mixed:   "Respond in a natural mix of Urdu and English — use Urdu for explanations and English for technical terms.",
+    urdu: "Respond entirely in Urdu script (اردو). Do not use Roman Urdu.",
+    simple: "Respond in very simple, basic English. Avoid long or complex words.",
+    mixed:
+      "Respond in a natural mix of Urdu and English — use Urdu for explanations and English for technical terms.",
   };
 
-  const subjectList = data.subjects && data.subjects.length > 0
-    ? data.subjects.join(", ")
-    : null;
+  const subjectList = data.subjects && data.subjects.length > 0 ? data.subjects.join(", ") : null;
 
   const studentCtx = [
     data.studentName ? `Name: ${data.studentName}` : null,
@@ -132,7 +131,8 @@ export const askTutor = createServerFn({
     } catch (err) {
       console.error("[tutor] DeepSeek call failed:", err);
       return {
-        reply: "The tutor hiccuped on my side. Give it another try in a moment — your streak and XP are safe!",
+        reply:
+          "The tutor hiccuped on my side. Give it another try in a moment — your streak and XP are safe!",
       };
     }
   });

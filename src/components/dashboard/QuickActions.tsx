@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Bot, Target, BarChart3 } from "lucide-react";
+import { Bot, Target, Flame, BookMarked } from "lucide-react";
 
 const actions = [
   {
@@ -11,17 +11,24 @@ const actions = [
   },
   {
     title: "Start Practice",
-    description: "Sharpen your skills",
+    description: "Sharpen your skills with MCQs",
     icon: Target,
     tint: "text-chart-2",
     to: "/practice",
   },
   {
-    title: "View Progress",
-    description: "See your learning journey",
-    icon: BarChart3,
+    title: "Blitz Mode ⚡",
+    description: "60s speed round — build combos",
+    icon: Flame,
+    tint: "text-amber-500",
+    to: "/blitz",
+  },
+  {
+    title: "Story Mode 📖",
+    description: "Learn through AI-crafted adventures",
+    icon: BookMarked,
     tint: "text-chart-3",
-    to: "/dashboard",
+    to: "/story",
   },
 ];
 

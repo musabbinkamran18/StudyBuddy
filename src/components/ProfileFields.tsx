@@ -20,13 +20,7 @@ import {
 
 type Setter = (patch: Partial<LearningProfileDraft>) => void;
 
-export function AboutYouFields({
-  draft,
-  set,
-}: {
-  draft: LearningProfileDraft;
-  set: Setter;
-}) {
+export function AboutYouFields({ draft, set }: { draft: LearningProfileDraft; set: Setter }) {
   return (
     <div className="space-y-5">
       <div className="space-y-2">
@@ -118,9 +112,7 @@ export function SubjectPicker({
             }`}
           >
             <span className="block font-medium text-foreground">{subject.name}</span>
-            <span className="mt-1 block text-xs text-muted-foreground">
-              {subject.description}
-            </span>
+            <span className="mt-1 block text-xs text-muted-foreground">{subject.description}</span>
           </button>
         );
       })}

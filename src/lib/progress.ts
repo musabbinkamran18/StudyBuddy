@@ -14,9 +14,9 @@ export interface MistakeEntry {
   topic: string;
   timestamp: number;
   // SRS fields (may be absent on entries saved before Phase 5)
-  interval: number;      // days until next review
-  nextReview: number;    // ms timestamp
-  repetitions: number;   // times correctly recalled
+  interval: number; // days until next review
+  nextReview: number; // ms timestamp
+  repetitions: number; // times correctly recalled
 }
 
 export function getDefaultTopicProgress(): TopicProgress {
@@ -44,11 +44,7 @@ export function loadSubjectProgress(
   }
 }
 
-function saveAllProgress(
-  userId: string,
-  subjectId: string,
-  all: Record<string, TopicProgress>,
-) {
+function saveAllProgress(userId: string, subjectId: string, all: Record<string, TopicProgress>) {
   localStorage.setItem(progressKey(userId, subjectId), JSON.stringify(all));
 }
 
@@ -83,11 +79,7 @@ export function completePractice(
   return curr;
 }
 
-export function completeBoss(
-  userId: string,
-  subjectId: string,
-  topicId: string,
-): TopicProgress {
+export function completeBoss(userId: string, subjectId: string, topicId: string): TopicProgress {
   const all = loadSubjectProgress(userId, subjectId);
   const curr = all[topicId] ?? getDefaultTopicProgress();
   curr.bossDone = true;
@@ -142,10 +134,7 @@ export function advanceMistake(userId: string, id: string): void {
   const reps = (entry.repetitions ?? 0) + 1;
   if (nextInterval >= 30 && reps >= 4) {
     // Fully mastered — remove
-    localStorage.setItem(
-      `mistakes:${userId}`,
-      JSON.stringify(list.filter((m) => m.id !== id)),
-    );
+    localStorage.setItem(`mistakes:${userId}`, JSON.stringify(list.filter((m) => m.id !== id)));
     return;
   }
   const now = Date.now();
@@ -154,7 +143,12 @@ export function advanceMistake(userId: string, id: string): void {
     JSON.stringify(
       list.map((m) =>
         m.id === id
-          ? { ...m, interval: nextInterval, nextReview: now + nextInterval * 24 * 60 * 60 * 1000, repetitions: reps }
+          ? {
+              ...m,
+              interval: nextInterval,
+              nextReview: now + nextInterval * 24 * 60 * 60 * 1000,
+              repetitions: reps,
+            }
           : m,
       ),
     ),
@@ -188,10 +182,7 @@ export function loadMistakes(userId: string): MistakeEntry[] {
 
 export function removeMistake(userId: string, id: string): void {
   const list = loadMistakes(userId);
-  localStorage.setItem(
-    `mistakes:${userId}`,
-    JSON.stringify(list.filter((m) => m.id !== id)),
-  );
+  localStorage.setItem(`mistakes:${userId}`, JSON.stringify(list.filter((m) => m.id !== id)));
 }
 
 export function clearMistakes(userId: string): void {
