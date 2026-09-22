@@ -86,17 +86,17 @@ export async function fetchTopics(
     return (DEMO_TOPICS[subject.code] ?? []).map((t) => ({ ...t, curriculum: null }));
   }
 
-  // Cloud mode — try grade+curriculum-specific topics first, fall back to generic
-  const base = supabase
-    .from("topics")
-    .select("id, subject_id, name, slug, description, grade, curriculum, difficulty, sort_order")
-    .eq("subject_id", subjectId)
-    .eq("is_active", true);
+  const sel = "id, subject_id, name, slug, description, grade, difficulty, sort_order";
 
+  // Cloud mode — try grade+curriculum-specific topics first, fall back to generic
   if (grade && curriculum) {
     const gradeKey = normalizeGrade(grade);
     const currKey = normalizeCurriculum(curriculum, grade);
-    const { data: specific } = await base
+    const { data: specific } = await supabase
+      .from("topics")
+      .select(`${sel}, curriculum`)
+      .eq("subject_id", subjectId)
+      .eq("is_active", true)
       .eq("grade", gradeKey)
       .eq("curriculum", currKey)
       .order("sort_order");
@@ -105,8 +105,13 @@ export async function fetchTopics(
     }
   }
 
-  // Generic fallback (no grade/curriculum filter)
-  const { data, error } = await base.is("curriculum", null).order("sort_order");
+  // Generic fallback (no grade/curriculum filter) — fresh query, no leftover filters
+  const { data, error } = await supabase
+    .from("topics")
+    .select(sel)
+    .eq("subject_id", subjectId)
+    .eq("is_active", true)
+    .order("sort_order");
   if (error) throw error;
   return (data ?? []).map((t) => ({ ...t, difficulty: t.difficulty as DifficultyValue, curriculum: null }));
 }
