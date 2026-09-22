@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/dashboard/BottomNav";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -197,6 +198,7 @@ function SkillsPage() {
 
   return (
     <div className="min-h-screen pb-40">
+      <BottomNav />
       {/* Sticky header */}
       <div className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3">

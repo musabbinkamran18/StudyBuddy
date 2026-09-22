@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/dashboard/BottomNav";
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -82,7 +83,8 @@ function BattleLobby() {
   };
 
   return (
-    <main className="min-h-screen bg-background px-4 py-12">
+    <main className="min-h-screen bg-background px-4 pb-24 pt-12 lg:pb-12">
+        <BottomNav />
       <div className="mx-auto w-full max-w-2xl">
         <Link
           to="/dashboard"

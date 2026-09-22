@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/dashboard/BottomNav";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
@@ -246,6 +247,7 @@ function PracticePage() {
     const isLoading = profileQuery.isLoading || subjectsQuery.isLoading;
     return (
       <div className="min-h-screen bg-background">
+        <BottomNav />
         <div className="mx-auto max-w-lg px-4 py-10">
           <Link
             to="/dashboard"

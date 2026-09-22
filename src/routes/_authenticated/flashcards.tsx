@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/dashboard/BottomNav";
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -175,7 +176,8 @@ function FlashcardsPage() {
 
   if (screen === "setup") {
     return (
-      <main className="min-h-screen bg-background px-4 py-12">
+      <main className="min-h-screen bg-background px-4 pb-24 pt-12 lg:pb-12">
+      <BottomNav />
         <div className="mx-auto w-full max-w-md space-y-6">
           <Link
             to="/dashboard"

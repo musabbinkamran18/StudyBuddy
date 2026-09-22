@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/dashboard/BottomNav";
 import { useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -55,7 +56,8 @@ function LeaderboardPage() {
   const weekLabel = `${weekStart.toLocaleDateString("en", { month: "short", day: "numeric" })} – ${today.toLocaleDateString("en", { month: "short", day: "numeric" })}`;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10">
+    <main className="min-h-screen bg-background px-4 pb-24 pt-10 lg:pb-10">
+      <BottomNav />
       <div className="mx-auto w-full max-w-2xl">
         <Link
           to="/dashboard"

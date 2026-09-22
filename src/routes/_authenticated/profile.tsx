@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/dashboard/BottomNav";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -174,7 +175,8 @@ function ProfilePage() {
   const examDays = daysUntilExam(prefs.examDate);
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10">
+    <main className="min-h-screen bg-background px-4 pb-24 pt-10 lg:pb-10">
+      <BottomNav />
       <div className="mx-auto w-full max-w-3xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -275,7 +277,7 @@ function ProfilePage() {
                   {[
                     { label: "Total XP", value: rewards.xp.toLocaleString(), emoji: "⭐" },
                     { label: "Best Streak", value: `${rewards.bestStreak}d`, emoji: "🔥" },
-                    { label: "Sessions", value: extended.totalSessions, emoji: "📚" },
+                    { label: "Sessions", value: extended.sessionsCompleted, emoji: "📚" },
                     { label: "Achievements", value: `${unlockedCount}/25`, emoji: "🏆" },
                   ].map((stat) => (
                     <div

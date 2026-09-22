@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/dashboard/BottomNav";
 import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
@@ -167,7 +168,8 @@ function StoryPage() {
   if (screen === "setup") {
     const ready = selectedSubjectId && selectedTopicId;
     return (
-      <div className="mx-auto max-w-lg space-y-6 px-4 py-8">
+      <div className="mx-auto max-w-lg space-y-6 px-4 pb-24 pt-8 lg:pb-8">
+        <BottomNav />
         <div className="flex items-center gap-3">
           <Link
             to="/dashboard"
@@ -274,7 +276,8 @@ function StoryPage() {
   // ────────────────────────────────── INTRO ──
   if (screen === "intro" && story) {
     return (
-      <div className="mx-auto max-w-lg space-y-6 px-4 py-8">
+      <div className="mx-auto max-w-lg space-y-6 px-4 pb-24 pt-8 lg:pb-8">
+        <BottomNav />
         <Link
           to="/dashboard"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
