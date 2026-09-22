@@ -176,7 +176,7 @@ function Dashboard() {
       <div className="flex min-h-screen flex-col lg:pl-[240px]">
         <TopBar userName={userName} streak={streak} coins={coins} avatar={avatar} />
 
-        <main className="flex-1 px-8 py-8">
+        <main className="flex-1 px-4 py-5 pb-24 sm:px-8 sm:py-8 lg:pb-8">
           {isProfileError ? (
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
               <p className="text-sm font-semibold text-foreground">Couldn't load your dashboard</p>

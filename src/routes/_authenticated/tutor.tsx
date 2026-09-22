@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Send, Sparkles, Bot, User, Settings, Trash2 } from "lucide-react";
@@ -29,7 +29,7 @@ import { TopBar } from "@/components/dashboard/TopBar";
 
 export const Route = createFileRoute("/_authenticated/tutor")({
   head: () => ({
-    meta: [{ title: "AI Tutor — Study Buddy" }],
+    meta: [{ title: "AI Tutor â€” Study Buddy" }],
   }),
   component: TutorPage,
 });
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/tutor")({
 const WELCOME_MESSAGE: TutorMessage = {
   role: "assistant",
   content:
-    "Hey! I'm Study Buddy, your personal AI tutor 👋\n\nI won't just give you the answers — I'll guide you through the thinking so you actually understand. Ask me anything about your subjects, or pick one below!",
+    "Hey! I'm Study Buddy, your personal AI tutor ðŸ‘‹\n\nI won't just give you the answers â€” I'll guide you through the thinking so you actually understand. Ask me anything about your subjects, or pick one below!",
 };
 
 function TutorPage() {
@@ -165,8 +165,8 @@ function TutorPage() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-foreground">Study Buddy</p>
               <p className="truncate text-xs text-muted-foreground">
-                {activePersonality.emoji} {activePersonality.label} · {activeStyle.emoji}{" "}
-                {activeStyle.label} · {activeLanguage.emoji} {activeLanguage.label}
+                {activePersonality.emoji} {activePersonality.label} Â· {activeStyle.emoji}{" "}
+                {activeStyle.label} Â· {activeLanguage.emoji} {activeLanguage.label}
               </p>
             </div>
 
@@ -350,7 +350,7 @@ function TutorPage() {
               {showPrompts && (
                 <div className="pt-2">
                   <p className="mb-3 text-center text-xs text-muted-foreground">
-                    {enrolledSubjects.length > 0 ? "Your subjects:" : "Try asking about…"}
+                    {enrolledSubjects.length > 0 ? "Your subjects:" : "Try asking aboutâ€¦"}
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {quickPrompts.map((p) => (
@@ -371,7 +371,7 @@ function TutorPage() {
           </div>
 
           {/* Input bar */}
-          <div className="border-t border-border bg-card/80 px-4 py-4 backdrop-blur-sm sm:px-6">
+          <div className="border-t border-border bg-card/80 px-4 py-4 pb-safe-bottom backdrop-blur-sm sm:px-6 lg:pb-4">
             <div className="mx-auto flex max-w-3xl items-end gap-3">
               <Textarea
                 ref={textareaRef}
@@ -383,7 +383,7 @@ function TutorPage() {
                     send();
                   }
                 }}
-                placeholder="Ask me anything about your subjects…"
+                placeholder="Ask me anything about your subjectsâ€¦"
                 className="max-h-36 min-h-[48px] flex-1 resize-none rounded-2xl border-border bg-background text-sm"
                 rows={1}
               />
@@ -397,7 +397,7 @@ function TutorPage() {
               </Button>
             </div>
             <p className="mt-2 text-center text-[11px] text-muted-foreground/60">
-              Enter to send · Shift+Enter for new line
+              Enter to send Â· Shift+Enter for new line
             </p>
           </div>
         </div>

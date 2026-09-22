@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mistakes")({
   head: () => ({
-    meta: [{ title: "Mistake Log — Study Buddy" }],
+    meta: [{ title: "Mistake Log â€” Study Buddy" }],
   }),
   component: MistakesPage,
 });
@@ -108,7 +108,7 @@ function MistakesPage() {
       <DashboardSidebar />
       <div className="flex min-h-screen flex-col lg:pl-[240px]">
         <TopBar userName={userName} coins={coins} avatar={avatar} />
-        <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8">
+        <main className="flex-1 px-4 py-6 pb-24 sm:px-8 sm:py-8 lg:pb-8">
           <div className="mx-auto max-w-3xl">
             <Link
               to="/dashboard"
@@ -125,8 +125,8 @@ function MistakesPage() {
                   {mistakes.length === 0
                     ? "No mistakes saved yet."
                     : dueCount > 0
-                      ? `${dueCount} due for review · ${mistakes.length} total`
-                      : `${mistakes.length} saved · none due right now`}
+                      ? `${dueCount} due for review Â· ${mistakes.length} total`
+                      : `${mistakes.length} saved Â· none due right now`}
                 </p>
               </div>
 
@@ -179,7 +179,7 @@ function MistakesPage() {
 
             {mistakes.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-20 text-center">
-                <div className="mb-4 text-6xl">🎉</div>
+                <div className="mb-4 text-6xl">ðŸŽ‰</div>
                 <h2 className="text-xl font-bold text-foreground">All clear!</h2>
                 <p className="mt-2 max-w-xs text-sm text-muted-foreground">
                   No mistakes saved. Keep practising to see areas where you can improve.
@@ -222,7 +222,7 @@ function MistakesPage() {
                               : "border border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
                           )}
                         >
-                          {s} ({count}){due > 0 && ` · ${due} due`}
+                          {s} ({count}){due > 0 && ` Â· ${due} due`}
                         </button>
                       );
                     })}
@@ -271,7 +271,7 @@ function MistakesPage() {
   );
 }
 
-// ─── Mistake Card (list view) ─────────────────────────────────────────────────
+// â”€â”€â”€ Mistake Card (list view) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface MistakeCardProps {
   mistake: MistakeEntry;
@@ -367,7 +367,7 @@ function MistakeCard({ mistake, onAdvance, onReset }: MistakeCardProps) {
             </Button>
           </div>
           <p className="mt-2 text-center text-[10px] text-muted-foreground">
-            Interval: every {mistake.interval ?? 1} day{(mistake.interval ?? 1) !== 1 ? "s" : ""} ·{" "}
+            Interval: every {mistake.interval ?? 1} day{(mistake.interval ?? 1) !== 1 ? "s" : ""} Â·{" "}
             {mistake.repetitions ?? 0} correct recalls
           </p>
         </div>
@@ -376,7 +376,7 @@ function MistakeCard({ mistake, onAdvance, onReset }: MistakeCardProps) {
   );
 }
 
-// ─── Flashcard View ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Flashcard View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface FlashcardViewProps {
   mistakes: MistakeEntry[];
@@ -509,7 +509,7 @@ function FlashcardView({
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        "Got it!" schedules next review in {Math.min((card.interval ?? 1) * 2, 30)} days · "Still
+        "Got it!" schedules next review in {Math.min((card.interval ?? 1) * 2, 30)} days Â· "Still
         struggling" resets to tomorrow
       </p>
     </div>

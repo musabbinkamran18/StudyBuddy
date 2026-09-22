@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Lock } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/achievements")({
   head: () => ({
-    meta: [{ title: "Achievements — Study Buddy" }],
+    meta: [{ title: "Achievements â€” Study Buddy" }],
   }),
   component: AchievementsPage,
 });
@@ -72,7 +72,7 @@ function AchievementsPage() {
       <DashboardSidebar />
       <div className="flex min-h-screen flex-col lg:pl-[240px]">
         <TopBar userName={userName} coins={coins} avatar={avatar} />
-        <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8">
+        <main className="flex-1 px-4 py-6 pb-24 sm:px-8 sm:py-8 lg:pb-8">
           <div className="mx-auto max-w-3xl">
             <Link
               to="/dashboard"
@@ -207,7 +207,7 @@ function AchievementsPage() {
                           </p>
                           {unlocked && achievement.coinReward > 0 && (
                             <span className="rounded-full bg-yellow-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-yellow-600 dark:text-yellow-400">
-                              +{achievement.coinReward}💎
+                              +{achievement.coinReward}ðŸ’Ž
                             </span>
                           )}
                         </div>
@@ -240,7 +240,7 @@ function AchievementsPage() {
                       </div>
 
                       {/* Unlocked badge */}
-                      {unlocked && <div className="shrink-0 text-xl">✅</div>}
+                      {unlocked && <div className="shrink-0 text-xl">âœ…</div>}
                     </div>
                   </div>
                 );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/shop")({
   head: () => ({
-    meta: [{ title: "Shop — Study Buddy" }],
+    meta: [{ title: "Shop â€” Study Buddy" }],
   }),
   component: ShopPage,
 });
@@ -64,7 +64,7 @@ function ShopPage() {
       <DashboardSidebar />
       <div className="flex min-h-screen flex-col lg:pl-[240px]">
         <TopBar userName={userName} />
-        <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8">
+        <main className="flex-1 px-4 py-6 pb-24 sm:px-8 sm:py-8 lg:pb-8">
           <div className="mx-auto max-w-2xl">
             <Link
               to="/dashboard"
@@ -87,7 +87,7 @@ function ShopPage() {
 
               {/* Coin balance */}
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
-                <span className="text-xl">💎</span>
+                <span className="text-xl">ðŸ’Ž</span>
                 <div className="text-right">
                   <p className="text-lg font-bold text-foreground">{coinState.balance}</p>
                   <p className="text-[10px] text-muted-foreground">coins</p>
@@ -106,11 +106,11 @@ function ShopPage() {
             <div className="mb-8 grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-border bg-card p-4 text-center">
                 <p className="text-3xl font-bold text-foreground">{coinState.xpBoosts}</p>
-                <p className="mt-1 text-sm text-muted-foreground">⚡ XP Boosts</p>
+                <p className="mt-1 text-sm text-muted-foreground">âš¡ XP Boosts</p>
               </div>
               <div className="rounded-2xl border border-border bg-card p-4 text-center">
                 <p className="text-3xl font-bold text-foreground">{coinState.streakFreezes}</p>
-                <p className="mt-1 text-sm text-muted-foreground">🧊 Streak Freezes</p>
+                <p className="mt-1 text-sm text-muted-foreground">ðŸ§Š Streak Freezes</p>
               </div>
             </div>
 
@@ -142,9 +142,9 @@ function ShopPage() {
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-lg">💎</span>
+                        <span className="text-lg">ðŸ’Ž</span>
                         <span className="text-lg font-bold text-foreground">{item.price}</span>
-                        <span className="text-xs text-muted-foreground">· {owned} owned</span>
+                        <span className="text-xs text-muted-foreground">Â· {owned} owned</span>
                       </div>
 
                       <Button
@@ -154,7 +154,7 @@ function ShopPage() {
                         className="rounded-full"
                         onClick={() => handleBuy(item.id)}
                       >
-                        {justBought ? "✓ Bought!" : canAfford ? "Buy" : "Need coins"}
+                        {justBought ? "âœ“ Bought!" : canAfford ? "Buy" : "Need coins"}
                       </Button>
                     </div>
                   </div>
@@ -164,19 +164,19 @@ function ShopPage() {
 
             {/* How to earn coins */}
             <div className="mt-8 rounded-2xl border border-border bg-card p-5">
-              <h3 className="mb-3 font-semibold text-foreground">How to Earn Coins 💎</h3>
+              <h3 className="mb-3 font-semibold text-foreground">How to Earn Coins ðŸ’Ž</h3>
               <div className="grid gap-2 text-sm">
                 {[
                   { label: "Complete a lesson", amount: "+10" },
                   { label: "Perfect lesson (no mistakes)", amount: "+20" },
                   { label: "Complete a practice session", amount: "+15" },
                   { label: "Defeat a Boss Battle", amount: "+25" },
-                  { label: "Complete daily missions", amount: "+10–40" },
-                  { label: "Daily login reward", amount: "+10–50" },
+                  { label: "Complete daily missions", amount: "+10â€“40" },
+                  { label: "Daily login reward", amount: "+10â€“50" },
                 ].map((row) => (
                   <div key={row.label} className="flex items-center justify-between">
                     <span className="text-muted-foreground">{row.label}</span>
-                    <span className="font-semibold text-foreground">{row.amount} 💎</span>
+                    <span className="font-semibold text-foreground">{row.amount} ðŸ’Ž</span>
                   </div>
                 ))}
               </div>
@@ -184,7 +184,7 @@ function ShopPage() {
 
             {/* Login reward cycle preview */}
             <div className="mt-4 rounded-2xl border border-border bg-card p-5">
-              <h3 className="mb-3 font-semibold text-foreground">Daily Login Rewards 🎁</h3>
+              <h3 className="mb-3 font-semibold text-foreground">Daily Login Rewards ðŸŽ</h3>
               <div className="grid grid-cols-7 gap-1.5">
                 {LOGIN_REWARDS.map((r) => (
                   <div key={r.day} className="flex flex-col items-center gap-1 text-center">

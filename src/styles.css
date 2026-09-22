@@ -215,4 +215,9 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Safe-area utility for bottom nav on notch/gesture-bar devices */
+  .pb-safe-bottom {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
 }

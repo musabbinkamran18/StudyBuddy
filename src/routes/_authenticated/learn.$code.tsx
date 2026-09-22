@@ -409,7 +409,7 @@ function LearnPage() {
       <DashboardSidebar />
       <div className="flex min-h-screen flex-col lg:pl-[240px]">
         <TopBar userName={userName} coins={coins} avatar={avatar} />
-        <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8">
+        <main className="flex-1 px-4 py-6 pb-24 sm:px-8 sm:py-8 lg:pb-8">
           {screen === "path" && (
             <PathView
               subject={subject}

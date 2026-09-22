@@ -1,0 +1,17 @@
+{
+  "name": "Study Buddy",
+  "short_name": "StudyBuddy",
+  "description": "Your adaptive learning companion",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

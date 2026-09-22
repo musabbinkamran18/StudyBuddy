@@ -67,7 +67,7 @@ function SubjectPage() {
       <div className="flex min-h-screen flex-col lg:pl-[240px]">
         <TopBar userName={userName} />
 
-        <main className="flex-1 px-8 py-8">
+        <main className="flex-1 px-4 py-5 pb-24 sm:px-8 sm:py-8 lg:pb-8">
           <Link
             to="/dashboard"
             className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
