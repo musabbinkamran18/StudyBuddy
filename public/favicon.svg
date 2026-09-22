@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background rounded square -->
+  <rect width="64" height="64" rx="14" fill="#e07040"/>
+  <rect width="64" height="64" rx="14" fill="url(#grad)"/>
+
+  <!-- Graduation cap -->
+  <!-- Diamond / top of cap -->
+  <polygon points="32,14 52,24 32,34 12,24" fill="white" opacity="0.95"/>
+  <!-- Cap brim shadow -->
+  <polygon points="32,34 52,24 52,27 32,37 12,27 12,24" fill="white" opacity="0.3"/>
+
+  <!-- Left side of cap body -->
+  <rect x="14" y="31" width="4" height="14" rx="2" fill="white" opacity="0.85"/>
+
+  <!-- Mortarboard body (trapezoid) -->
+  <path d="M22 34 L42 34 L44 48 Q32 52 20 48 Z" fill="white" opacity="0.95"/>
+
+  <!-- Tassel -->
+  <line x1="50" y1="24" x2="50" y2="36" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="50" cy="37" r="2.5" fill="white" opacity="0.9"/>
+
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0854a"/>
+      <stop offset="100%" stop-color="#c2562a"/>
+    </linearGradient>
+  </defs>
+</svg>
