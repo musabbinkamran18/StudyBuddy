@@ -1,5 +1,5 @@
 import { BottomNav } from "@/components/dashboard/BottomNav";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   getCurrentLeague,
@@ -11,7 +11,9 @@ import { getWeeklyStats } from "@/lib/study-log";
 import { loadRewards } from "@/lib/rewards";
 import { loadAvatar } from "@/lib/avatar";
 import { fetchMyProfile } from "@/lib/profile-data";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { isDemo } from "@/lib/backend";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +27,7 @@ export const Route = createFileRoute("/_authenticated/leaderboard")({
 
 function LeaderboardPage() {
   const { user } = Route.useRouteContext();
+  const queryClient = useQueryClient();
 
   const profileQuery = useQuery({
     queryKey: ["my-profile", user.id],
@@ -41,8 +44,42 @@ function LeaderboardPage() {
   const lbQuery = useQuery({
     queryKey: ["leaderboard", user.id],
     queryFn: () => fetchLeaderboard(user.id, userName, avatar, weeklyXp, totalXp),
-    staleTime: 60_000,
+    staleTime: 20_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   });
+
+  // Tick every 10 s so "Updated X ago" stays accurate between refetches
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 10_000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Realtime subscription — push instant refresh whenever any game_state row changes
+  useEffect(() => {
+    let mounted = true;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    void isDemo().then((demo) => {
+      if (demo || !mounted) return;
+      try {
+        channel = supabase
+          .channel("leaderboard-live")
+          .on("postgres_changes", { event: "*", schema: "public", table: "game_state" }, () => {
+            void queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+          })
+          .subscribe();
+      } catch {
+        // Supabase not connected — polling fallback is enough
+      }
+    });
+
+    return () => {
+      mounted = false;
+      if (channel) void supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const weeklyBoard = lbQuery.data?.weekly ?? [];
   const allTimeBoard = lbQuery.data?.allTime ?? [];
@@ -59,13 +96,22 @@ function LeaderboardPage() {
     <main className="min-h-screen bg-background px-4 pb-24 pt-10 lg:pb-10">
       <BottomNav />
       <div className="mx-auto w-full max-w-2xl">
-        <Link
-          to="/dashboard"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Dashboard
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Dashboard
+          </Link>
+          <div className="flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-1 text-[11px] font-semibold text-green-600 dark:text-green-400">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+            </span>
+            Live
+          </div>
+        </div>
 
         {/* Hero: user's standing */}
         <div
@@ -149,7 +195,14 @@ function LeaderboardPage() {
 
           {/* Weekly */}
           <TabsContent value="weekly" className="mt-6">
-            <p className="mb-4 text-xs text-muted-foreground text-center">{weekLabel}</p>
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">{weekLabel}</p>
+              {lbQuery.dataUpdatedAt > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Updated {Math.round((now - lbQuery.dataUpdatedAt) / 1000)}s ago
+                </p>
+              )}
+            </div>
             {lbQuery.isPending ? (
               <LeaderboardSkeleton />
             ) : (
