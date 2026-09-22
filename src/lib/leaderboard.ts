@@ -94,8 +94,14 @@ export function generateWeeklyLeaderboard(
   userWeeklyXp: number,
   userName: string,
   userAvatar = "⭐",
+  userTotalXp = 0,
 ): LeaderboardEntry[] {
   const seed = weekSeed();
+  const league = getCurrentLeague(userTotalXp);
+  // Clamp fake weekly XP so it stays plausible for the league's total XP tier
+  const leagueRange = league.nextXp != null ? league.nextXp - league.minXp : 5000;
+  const maxWeeklyXp = Math.max(userWeeklyXp + 300, Math.round(leagueRange * 0.4));
+
   const count = 14; // 14 fake players + 1 real user = 15 total
 
   const fakes: { name: string; avatar: string; weeklyXp: number }[] = [];
@@ -113,13 +119,10 @@ export function generateWeeklyLeaderboard(
     // Spread XP around the user's value: some above, some below
     let xp: number;
     if (i < 4) {
-      // Top players — clearly ahead
       xp = userWeeklyXp + seededRand(seed + i * 11, 80, 300);
     } else if (i >= count - 3) {
-      // Bottom players — clearly behind
       xp = Math.max(0, userWeeklyXp - seededRand(seed + i * 13, 80, 250));
     } else {
-      // Middle players — scattered around
       const delta = seededRand(seed + i * 17, -120, 120);
       xp = Math.max(0, userWeeklyXp + delta);
     }
@@ -127,7 +130,7 @@ export function generateWeeklyLeaderboard(
     fakes.push({
       name,
       avatar: AVATARS[seededRand(seed + i * 5, 0, AVATARS.length - 1)]!,
-      weeklyXp: xp,
+      weeklyXp: Math.min(xp, maxWeeklyXp),
     });
   }
 
@@ -199,6 +202,13 @@ export async function fetchLeaderboard(
       };
     });
 
+    // Only show users who are in the same league as the current user
+    const currentUserXp = entries.find((e) => e.isCurrentUser)?.totalXp ?? fallbackTotalXp;
+    const currentLeagueName = getCurrentLeague(currentUserXp).name;
+    const leagueEntries = entries.filter(
+      (e) => getCurrentLeague(e.totalXp).name === currentLeagueName,
+    );
+
     const toBoard = (sorted: Raw[]): LeaderboardEntry[] =>
       sorted.map((e, i) => ({
         rank: i + 1,
@@ -209,14 +219,14 @@ export async function fetchLeaderboard(
       }));
 
     const weekly = toBoard(
-      [...entries].sort((a, b) => b.weekXp - a.weekXp).map((e) => ({ ...e, totalXp: e.weekXp })),
+      [...leagueEntries].sort((a, b) => b.weekXp - a.weekXp).map((e) => ({ ...e, totalXp: e.weekXp })),
     );
-    const allTime = toBoard([...entries].sort((a, b) => b.totalXp - a.totalXp));
+    const allTime = toBoard([...leagueEntries].sort((a, b) => b.totalXp - a.totalXp));
 
     return { weekly, allTime };
   } catch {
     return {
-      weekly: generateWeeklyLeaderboard(fallbackWeeklyXp, fallbackUserName, fallbackAvatar),
+      weekly: generateWeeklyLeaderboard(fallbackWeeklyXp, fallbackUserName, fallbackAvatar, fallbackTotalXp),
       allTime: generateAllTimeLeaderboard(fallbackTotalXp, fallbackUserName, fallbackAvatar),
     };
   }
@@ -277,8 +287,9 @@ export function generateAllTimeLeaderboard(
     });
   }
 
+  const userLeagueName = getCurrentLeague(userTotalXp).name;
   const all = [
-    ...fakes,
+    ...fakes.filter((f) => getCurrentLeague(f.weeklyXp).name === userLeagueName),
     { name: userName, avatar: userAvatar, weeklyXp: userTotalXp, isCurrentUser: true },
   ];
   all.sort((a, b) => b.weeklyXp - a.weeklyXp);

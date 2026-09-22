@@ -146,7 +146,8 @@ function demoTopics(code: string, names: string[]): Topic[] {
     slug: null,
     description: null,
     grade: null,
-    difficulty: "medium",
+    curriculum: null,
+    difficulty: "medium" as const,
     sort_order: i + 1,
   }));
 }

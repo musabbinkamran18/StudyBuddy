@@ -134,9 +134,12 @@ function LearnPage() {
   const subjectsQuery = useQuery({ queryKey: ["subjects"], queryFn: fetchSubjects });
   const subject = subjectsQuery.data?.find((s) => s.code === code);
 
+  const grade = profileQuery.data?.draft.grade;
+  const curriculum = profileQuery.data?.draft.curriculum;
+
   const topicsQuery = useQuery({
-    queryKey: ["topics", subject?.id ?? code],
-    queryFn: () => fetchTopics(subject?.id ?? ""),
+    queryKey: ["topics", subject?.id ?? code, grade, curriculum],
+    queryFn: () => fetchTopics(subject?.id ?? "", grade, curriculum),
     enabled: Boolean(subject?.id),
   });
 

@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { isDemo } from "./backend";
 import type { PracticeQuestion } from "./practice";
 
@@ -226,7 +227,7 @@ export async function startBattleWithQuestions(
 
   await supabase
     .from("battle_rooms")
-    .update({ questions: questions as unknown as object, status: "playing" })
+    .update({ questions: questions as unknown as Json, status: "playing" })
     .eq("code", code);
 }
 

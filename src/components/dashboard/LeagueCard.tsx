@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {
   getCurrentLeague,
-  generateWeeklyLeaderboard,
+  fetchLeaderboard,
   type LeaderboardEntry,
 } from "@/lib/leaderboard";
 import { loadAvatar } from "@/lib/avatar";
@@ -22,8 +22,9 @@ export function LeagueCard({ totalXp, userName, userId }: LeagueCardProps) {
   useEffect(() => {
     const userAvatar = loadAvatar(userId);
     const weeklyXp = getWeeklyStats(userId).reduce((sum, d) => sum + d.xp, 0);
-    const board = generateWeeklyLeaderboard(weeklyXp, userName, userAvatar);
-    setLeaderboard(board);
+    fetchLeaderboard(userId, userName, userAvatar, weeklyXp, totalXp).then(({ weekly }) =>
+      setLeaderboard(weekly),
+    );
   }, [totalXp, userName, userId]);
 
   // Show 5 entries around the current user

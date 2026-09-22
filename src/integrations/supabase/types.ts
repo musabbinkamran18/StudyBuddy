@@ -71,6 +71,78 @@ export type Database = {
           },
         ];
       };
+      battle_rooms: {
+        Row: {
+          id: string;
+          code: string;
+          host_id: string;
+          guest_id: string | null;
+          host_name: string;
+          guest_name: string | null;
+          host_avatar: string;
+          guest_avatar: string | null;
+          subject: string;
+          topic: string;
+          difficulty: string;
+          status: string;
+          questions: Json;
+          host_score: number;
+          guest_score: number;
+          host_correct: number;
+          guest_correct: number;
+          host_finished: boolean;
+          guest_finished: boolean;
+          winner_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          host_id: string;
+          guest_id?: string | null;
+          host_name: string;
+          guest_name?: string | null;
+          host_avatar: string;
+          guest_avatar?: string | null;
+          subject?: string;
+          topic?: string;
+          difficulty?: string;
+          status?: string;
+          questions?: Json;
+          host_score?: number;
+          guest_score?: number;
+          host_correct?: number;
+          guest_correct?: number;
+          host_finished?: boolean;
+          guest_finished?: boolean;
+          winner_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          code?: string;
+          host_id?: string;
+          guest_id?: string | null;
+          host_name?: string;
+          guest_name?: string | null;
+          host_avatar?: string;
+          guest_avatar?: string | null;
+          subject?: string;
+          topic?: string;
+          difficulty?: string;
+          status?: string;
+          questions?: Json;
+          host_score?: number;
+          guest_score?: number;
+          host_correct?: number;
+          guest_correct?: number;
+          host_finished?: boolean;
+          guest_finished?: boolean;
+          winner_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       badges: {
         Row: {
           code: string;
@@ -722,6 +794,7 @@ export type Database = {
       topics: {
         Row: {
           created_at: string;
+          curriculum: string | null;
           description: string | null;
           difficulty: Database["public"]["Enums"]["difficulty_level"];
           grade: string | null;
@@ -736,6 +809,7 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          curriculum?: string | null;
           description?: string | null;
           difficulty?: Database["public"]["Enums"]["difficulty_level"];
           grade?: string | null;
@@ -750,6 +824,7 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          curriculum?: string | null;
           description?: string | null;
           difficulty?: Database["public"]["Enums"]["difficulty_level"];
           grade?: string | null;

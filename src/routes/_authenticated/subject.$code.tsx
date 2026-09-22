@@ -47,9 +47,12 @@ function SubjectPage() {
 
   const subject = subjectsQuery.data?.find((s) => s.code === code);
 
+  const grade = profileQuery.data?.draft.grade;
+  const curriculum = profileQuery.data?.draft.curriculum;
+
   const topicsQuery = useQuery({
-    queryKey: ["topics", subject?.id ?? code],
-    queryFn: () => fetchTopics(subject?.id ?? ""),
+    queryKey: ["topics", subject?.id ?? code, grade, curriculum],
+    queryFn: () => fetchTopics(subject?.id ?? "", grade, curriculum),
     enabled: Boolean(subject),
   });
 
@@ -141,9 +144,9 @@ function SubjectPage() {
                         </p>
                       )}
 
-                      {topic.grade && (
+                      {topic.curriculum && (
                         <p className="mt-2 flex items-center gap-1 text-[11px] text-muted-foreground">
-                          <GraduationCap className="h-3.5 w-3.5" /> {topic.grade}
+                          <GraduationCap className="h-3.5 w-3.5" /> {curriculum ?? topic.grade}
                         </p>
                       )}
 

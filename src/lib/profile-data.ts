@@ -9,6 +9,12 @@ import {
   saveDemoProfile,
   type DemoProfileState,
 } from "./backend";
+import {
+  getTopicsForStudent,
+  normalizeGrade,
+  normalizeCurriculum,
+  type SyllabusEntry,
+} from "./syllabus";
 
 export type Subject = {
   id: string;
@@ -26,6 +32,7 @@ export type Topic = {
   slug: string | null;
   description: string | null;
   grade: string | null;
+  curriculum: string | null;
   difficulty: DifficultyValue;
   sort_order: number;
 };
@@ -41,19 +48,67 @@ export async function fetchSubjects(): Promise<Subject[]> {
   return data ?? [];
 }
 
-export async function fetchTopics(subjectId: string): Promise<Topic[]> {
+function syllabusToTopics(
+  entries: SyllabusEntry[],
+  subject: { id: string; code: string },
+  grade: string,
+  curriculumKey: string,
+): Topic[] {
+  return entries.map((e, i) => ({
+    id: `syllabus-${subject.code}-${grade}-${curriculumKey}-${i}`,
+    subject_id: subject.id,
+    name: e.name,
+    slug: null,
+    description: e.description ?? null,
+    grade,
+    curriculum: curriculumKey,
+    difficulty: e.difficulty,
+    sort_order: e.sort_order,
+  }));
+}
+
+export async function fetchTopics(
+  subjectId: string,
+  grade?: string,
+  curriculum?: string,
+): Promise<Topic[]> {
   if (await isDemo()) {
     const subject = DEMO_SUBJECTS.find((s) => s.id === subjectId);
-    return subject ? (DEMO_TOPICS[subject.code] ?? []) : [];
+    if (!subject) return [];
+
+    if (grade && curriculum) {
+      const entries = getTopicsForStudent(subject.code, grade, curriculum);
+      if (entries) {
+        const key = normalizeCurriculum(curriculum, grade);
+        return syllabusToTopics(entries, subject, normalizeGrade(grade), key);
+      }
+    }
+    return (DEMO_TOPICS[subject.code] ?? []).map((t) => ({ ...t, curriculum: null }));
   }
-  const { data, error } = await supabase
+
+  // Cloud mode — try grade+curriculum-specific topics first, fall back to generic
+  const base = supabase
     .from("topics")
-    .select("id, subject_id, name, slug, description, grade, difficulty, sort_order")
+    .select("id, subject_id, name, slug, description, grade, curriculum, difficulty, sort_order")
     .eq("subject_id", subjectId)
-    .eq("is_active", true)
-    .order("sort_order");
+    .eq("is_active", true);
+
+  if (grade && curriculum) {
+    const gradeKey = normalizeGrade(grade);
+    const currKey = normalizeCurriculum(curriculum, grade);
+    const { data: specific } = await base
+      .eq("grade", gradeKey)
+      .eq("curriculum", currKey)
+      .order("sort_order");
+    if (specific && specific.length > 0) {
+      return specific.map((t) => ({ ...t, difficulty: t.difficulty as DifficultyValue, curriculum: t.curriculum ?? null }));
+    }
+  }
+
+  // Generic fallback (no grade/curriculum filter)
+  const { data, error } = await base.is("curriculum", null).order("sort_order");
   if (error) throw error;
-  return (data ?? []).map((t) => ({ ...t, difficulty: t.difficulty as DifficultyValue }));
+  return (data ?? []).map((t) => ({ ...t, difficulty: t.difficulty as DifficultyValue, curriculum: null }));
 }
 
 export function fromDemoProfile(state: DemoProfileState): {

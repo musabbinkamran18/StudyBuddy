@@ -153,7 +153,7 @@ function LeaderboardPage() {
             ) : (
               <>
                 <Podium entries={weeklyBoard.slice(0, 3)} />
-                <RankList board={weeklyBoard} userId={user.id} labelSuffix="XP this week" />
+                <RankList board={weeklyBoard} startFrom={Math.min(3, weeklyBoard.length)} userId={user.id} labelSuffix="XP this week" />
               </>
             )}
           </TabsContent>
@@ -166,7 +166,7 @@ function LeaderboardPage() {
             ) : (
               <>
                 <Podium entries={allTimeBoard.slice(0, 3)} />
-                <RankList board={allTimeBoard} userId={user.id} labelSuffix="XP total" />
+                <RankList board={allTimeBoard} startFrom={Math.min(3, allTimeBoard.length)} userId={user.id} labelSuffix="XP total" />
               </>
             )}
           </TabsContent>
@@ -266,16 +266,13 @@ function LeaderboardSkeleton() {
 
 function Podium({ entries }: { entries: LeaderboardEntry[] }) {
   const [first, second, third] = entries;
-  if (!first || !second || !third) return null;
+  if (!first) return null;
 
   return (
     <div className="mb-6 flex items-end justify-center gap-3">
-      {/* 2nd */}
-      <PodiumStand entry={second} height="h-20" position={2} color="#c0c0c0" />
-      {/* 1st */}
+      {second && <PodiumStand entry={second} height="h-20" position={2} color="#c0c0c0" />}
       <PodiumStand entry={first} height="h-28" position={1} color="#ffd700" />
-      {/* 3rd */}
-      <PodiumStand entry={third} height="h-14" position={3} color="#cd7f32" />
+      {third && <PodiumStand entry={third} height="h-14" position={3} color="#cd7f32" />}
     </div>
   );
 }
@@ -318,10 +315,12 @@ function PodiumStand({
 
 function RankList({
   board,
+  startFrom = 3,
   userId: _userId,
   labelSuffix,
 }: {
   board: LeaderboardEntry[];
+  startFrom?: number;
   userId: string;
   labelSuffix: string;
 }) {
@@ -330,8 +329,9 @@ function RankList({
   const userEntry = board.find((e) => e.isCurrentUser);
   const userRank = userEntry?.rank ?? board.length;
 
-  const visible = showAll ? board.slice(3) : board.slice(3, 10);
-  const userVisible = showAll || userRank <= 10 + 3;
+  const pageSize = 10;
+  const visible = showAll ? board.slice(startFrom) : board.slice(startFrom, startFrom + pageSize);
+  const userVisible = showAll || userRank <= startFrom + pageSize;
 
   const scrollToUser = () => {
     setShowAll(true);
@@ -380,7 +380,7 @@ function RankList({
         </div>
       ))}
 
-      {!showAll && board.length > 13 && (
+      {!showAll && board.length > startFrom + pageSize && (
         <div className="flex gap-2 pt-2">
           <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowAll(true)}>
             <ChevronDown className="h-4 w-4" />

@@ -63,10 +63,13 @@ function Dashboard() {
   const draft = profileQuery.data?.draft;
   const mySubjects = (subjectsQuery.data ?? []).filter((s) => draft?.subjectIds.includes(s.id));
 
+  const grade = draft?.grade;
+  const curriculum = draft?.curriculum;
+
   const topicQueries = useQueries({
     queries: mySubjects.map((s) => ({
-      queryKey: ["topics", s.id],
-      queryFn: () => fetchTopics(s.id),
+      queryKey: ["topics", s.id, grade, curriculum],
+      queryFn: () => fetchTopics(s.id, grade, curriculum),
     })),
   });
 

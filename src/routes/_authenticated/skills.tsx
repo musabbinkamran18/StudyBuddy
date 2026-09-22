@@ -147,9 +147,12 @@ function SkillsPage() {
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
   const effectiveSubjectId = selectedSubjectId ?? displaySubjects[0]?.id ?? null;
 
+  const grade = draft?.grade;
+  const curriculum = draft?.curriculum;
+
   const topicsQuery = useQuery({
-    queryKey: ["topics", effectiveSubjectId],
-    queryFn: () => fetchTopics(effectiveSubjectId!),
+    queryKey: ["topics", effectiveSubjectId, grade, curriculum],
+    queryFn: () => fetchTopics(effectiveSubjectId!, grade, curriculum),
     enabled: !!effectiveSubjectId,
   });
 
