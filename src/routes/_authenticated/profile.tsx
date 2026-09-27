@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { fetchSubjects, fetchMyProfile, saveMyProfile } from "@/lib/profile-data";
+import { fetchSubjects, fetchMyProfile, saveMyProfile, filterSubjectsByGrade } from "@/lib/profile-data";
 import {
   emptyDraft,
   validateDraft,
@@ -349,7 +349,7 @@ function ProfilePage() {
 
                 <Section title="Subjects" description="Everything you want to practise.">
                   <SubjectPicker
-                    subjects={subjectsQuery.data ?? []}
+                    subjects={filterSubjectsByGrade(subjectsQuery.data ?? [], draft.grade)}
                     selected={draft.subjectIds}
                     toggle={toggleSubject}
                   />

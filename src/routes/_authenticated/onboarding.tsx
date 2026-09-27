@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { fetchSubjects, fetchMyProfile, saveMyProfile } from "@/lib/profile-data";
+import { fetchSubjects, fetchMyProfile, saveMyProfile, filterSubjectsByGrade } from "@/lib/profile-data";
 import {
   emptyDraft,
   validateDraft,
@@ -151,7 +151,7 @@ function Onboarding() {
                 {step === 1 && <SchoolFields draft={draft} set={set} />}
                 {step === 2 && (
                   <SubjectPicker
-                    subjects={subjectsQuery.data ?? []}
+                    subjects={filterSubjectsByGrade(subjectsQuery.data ?? [], draft.grade)}
                     selected={draft.subjectIds}
                     toggle={toggleSubject}
                   />

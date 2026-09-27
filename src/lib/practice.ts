@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { describeRejections, sanitizeQuestions, QUESTION_QUALITY_RULES } from "./question-quality";
+import type { QuestionRejection } from "./question-quality";
 
 export interface PracticeQuestion {
   id: string;
@@ -62,11 +64,86 @@ export const generatePracticeQuestions = createServerFn({ method: "POST" })
       return { questions: getFallbackQuestions(data.topic, data.difficulty, count) };
     }
 
-    const styleClause = data.learningStyle
-      ? `\nLearning style: ${buildStyleInstruction(data.learningStyle)}\n`
+    const context = { topic: data.topic, difficulty: data.difficulty };
+
+    try {
+      const raw = await callModel(apiKey, buildQuestionPrompt(data, count, []), 0.7);
+      const first = sanitizeQuestions(raw, { ...context, max: count });
+
+      // A rejected question is usually a grammar slip, a bundled option, or a
+      // stem that leaked the answer. Ask for replacements instead of showing it.
+      if (first.rejected.length > 0 && first.accepted.length < count) {
+        try {
+          const repairRaw = await callModel(
+            apiKey,
+            buildQuestionPrompt(data, count - first.accepted.length, first.rejected),
+            0.5,
+          );
+          const repair = sanitizeQuestions(repairRaw, {
+            ...context,
+            max: count - first.accepted.length,
+          });
+          const merged = [...first.accepted, ...repair.accepted];
+          if (merged.length > 0) return { questions: merged };
+        } catch (err) {
+          console.error("[practice] repair pass failed:", err);
+        }
+      }
+
+      if (first.accepted.length === 0) {
+        return { questions: getFallbackQuestions(data.topic, data.difficulty, count) };
+      }
+      return { questions: first.accepted };
+    } catch (err) {
+      console.error("[practice] generation failed:", err);
+      return { questions: getFallbackQuestions(data.topic, data.difficulty, count) };
+    }
+  });
+
+async function callModel(apiKey: string, prompt: string, temperature: number): Promise<unknown> {
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 2500,
+      temperature,
+      stream: false,
+    }),
+  });
+
+  if (!res.ok) throw new Error(`DeepSeek ${res.status}`);
+
+  const json = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const raw = json.choices?.[0]?.message?.content?.trim() ?? "";
+  if (!raw) throw new Error("empty response");
+  const cleaned = raw
+    .replace(/^```(?:json)?\n?/, "")
+    .replace(/\n?```$/, "")
+    .trim();
+  return JSON.parse(cleaned) as unknown;
+}
+
+function buildQuestionPrompt(
+  data: GeneratePracticeInput,
+  count: number,
+  rejected: readonly QuestionRejection[],
+): string {
+  const styleClause = data.learningStyle
+    ? `\nLearning style: ${buildStyleInstruction(data.learningStyle)}\n`
+    : "";
+  const repairClause =
+    rejected.length > 0
+      ? `\nThe questions below were rejected by an automatic checker. Write NEW questions that do not repeat their wording and that avoid the listed problem:\n${describeRejections(rejected)}\n`
       : "";
 
-    const prompt = `Generate exactly ${count} multiple-choice questions for a student.
+  return `Generate exactly ${count} multiple-choice questions for a student.
 
 Subject: ${data.subject}
 Topic: ${data.topic}
@@ -84,6 +161,8 @@ Rules:
 7. All facts must be 100% correct
 8. CRITICAL — vary the position of the correct answer: spread it across index 0, 1, 2, and 3 across the question set. Do NOT place it at index 0 more than twice in a row. A uniform distribution across all four positions is required.
 9. Every question in the set must be unique — no two questions should test the same sub-concept or use the same sentence structure
+${repairClause}
+${QUESTION_QUALITY_RULES}
 
 Return ONLY a valid JSON array. No markdown fences, no extra text:
 [
@@ -97,42 +176,7 @@ Return ONLY a valid JSON array. No markdown fences, no extra text:
     "topic": "${data.topic}"
   }
 ]`;
-
-    try {
-      const res = await fetch("https://api.deepseek.com/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: 2500,
-          temperature: 0.75,
-          stream: false,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`DeepSeek ${res.status}`);
-
-      const json = (await res.json()) as {
-        choices?: Array<{ message?: { content?: string } }>;
-      };
-      const raw = json.choices?.[0]?.message?.content?.trim() ?? "";
-      const cleaned = raw
-        .replace(/^```(?:json)?\n?/, "")
-        .replace(/\n?```$/, "")
-        .trim();
-      const questions = JSON.parse(cleaned) as PracticeQuestion[];
-
-      if (!Array.isArray(questions) || questions.length === 0) throw new Error("empty");
-      return { questions: questions.slice(0, count) };
-    } catch (err) {
-      console.error("[practice] generation failed:", err);
-      return { questions: getFallbackQuestions(data.topic, data.difficulty, count) };
-    }
-  });
+}
 
 function buildStyleInstruction(style: "visual" | "reading" | "practical" | "mixed"): string {
   const map: Record<typeof style, string> = {

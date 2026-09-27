@@ -37,6 +37,28 @@ export type Topic = {
   sort_order: number;
 };
 
+/** Subject codes that require secondary-school prior knowledge (grade 9+). */
+const ADVANCED_SUBJECT_CODES = new Set(["physics", "chemistry", "biology"]);
+
+/** Subject codes only appropriate from grade 6 onwards. */
+const GRADE_6_PLUS_CODES = new Set(["geography"]);
+
+function gradeNumber(grade: string): number {
+  if (/university/i.test(grade)) return 13;
+  const m = /\d+/.exec(grade);
+  return m ? Number(m[0]) : 99;
+}
+
+/** Hides Physics/Chemistry/Biology for grades 1–8; hides Geography for grades 1–5. */
+export function filterSubjectsByGrade(subjects: Subject[], grade: string): Subject[] {
+  const n = gradeNumber(grade);
+  return subjects.filter((s) => {
+    if (n <= 8 && ADVANCED_SUBJECT_CODES.has(s.code)) return false;
+    if (n < 6 && GRADE_6_PLUS_CODES.has(s.code)) return false;
+    return true;
+  });
+}
+
 export async function fetchSubjects(): Promise<Subject[]> {
   if (await isDemo()) return DEMO_SUBJECTS;
   const { data, error } = await supabase

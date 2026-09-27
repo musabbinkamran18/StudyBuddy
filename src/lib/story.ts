@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { normalizeText, sanitizeQuestions, QUESTION_QUALITY_RULES } from "./question-quality";
 
 export interface StoryScene {
   text: string;
@@ -115,7 +116,8 @@ Requirements:
 - Every question must use a different question format: calculation, fill-in-the-blank, which-of-these, reverse question (what caused X?), comparison
 - Setting should feel real and relatable (market, school, kitchen, sports, travel)
 - Each scene adds a new situation — don't repeat the same setup
-- Difficulty matches grade ${data.grade}`;
+- Difficulty matches grade ${data.grade}
+${QUESTION_QUALITY_RULES}`;
 
     try {
       const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
@@ -145,8 +147,52 @@ Requirements:
         return { story: getFallbackStory(data.subject, data.topic) };
       }
 
+      parsed.title = capitalize(normalizeText(parsed.title ?? ""));
+      parsed.scenes = parsed.scenes
+        .map((scene) => cleanScene(scene, data.topic))
+        .filter((scene): scene is StoryScene => scene !== null);
+      if (parsed.scenes.length === 0) {
+        return { story: getFallbackStory(data.subject, data.topic) };
+      }
+
       return { story: parsed };
     } catch {
       return { story: getFallbackStory(data.subject, data.topic) };
     }
   });
+
+/**
+ * Runs a scene question through the same checker as practice questions, so a
+ * story never ships a bundled comparison option or a stem that leaks its answer.
+ */
+function cleanScene(scene: StoryScene, topic: string): StoryScene | null {
+  const { accepted, rejected } = sanitizeQuestions(
+    [
+      {
+        question: scene?.question,
+        options: scene?.options,
+        correct_answer: scene?.correct_answer,
+        explanation: scene?.explanation,
+        difficulty: "medium",
+        topic,
+      },
+    ],
+    { topic, difficulty: "medium" },
+  );
+  const clean = accepted[0];
+  if (!clean) {
+    console.error("[story] scene question rejected:", rejected[0]?.reason);
+    return null;
+  }
+  return {
+    text: normalizeText(scene.text ?? ""),
+    question: clean.question,
+    options: clean.options,
+    correct_answer: clean.correct_answer,
+    explanation: normalizeText(scene.explanation ?? "") || clean.explanation,
+  };
+}
+
+function capitalize(raw: string): string {
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}

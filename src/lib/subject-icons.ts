@@ -9,6 +9,7 @@ import {
   Moon,
   Languages,
   Globe,
+  MapPin,
   BookMarked,
   type LucideIcon,
 } from "lucide-react";
@@ -25,6 +26,7 @@ export const ICONS: Record<string, LucideIcon> = {
   Moon,
   Languages,
   Globe,
+  MapPin,
 };
 
 export const FALLBACK_COLOR = "#38bdf8";

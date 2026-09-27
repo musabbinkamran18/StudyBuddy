@@ -133,6 +133,14 @@ export const DEMO_SUBJECTS: Subject[] = [
     icon: "Globe",
     color: "#f87171",
   },
+  {
+    id: "10000000-0000-4000-8000-000000000011",
+    code: "geography",
+    name: "Geography",
+    description: "Maps, physical features, climate and world regions",
+    icon: "MapPin",
+    color: "#22d3ee",
+  },
 ];
 
 /* --------------------------------------------------------------- demo topics */
@@ -224,6 +232,14 @@ export const DEMO_TOPICS: Record<string, Topic[]> = {
     "Civics & Citizenship",
     "Economics Basics",
     "Cultures & Traditions",
+  ]),
+  geography: demoTopics("geography", [
+    "Map Skills & Cartography",
+    "Physical Geography",
+    "Human Geography",
+    "Climate & Weather",
+    "World Regions",
+    "Natural Resources & Environment",
   ]),
 };
 
