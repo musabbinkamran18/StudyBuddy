@@ -64,13 +64,13 @@ function BattleLobby() {
         toast.error("Room not found. Check the code and try again.");
         return;
       }
-      if (room.status !== "waiting") {
-        toast.error("That battle has already started or finished.");
+      // Host or already-joined guest can always re-enter regardless of status
+      if (room.hostId === user.id || room.guestId === user.id) {
+        await navigate({ to: "/battle/$code", params: { code } });
         return;
       }
-      if (room.hostId === user.id) {
-        // They own this room — just navigate
-        await navigate({ to: "/battle/$code", params: { code } });
+      if (room.status !== "waiting") {
+        toast.error("That battle has already started or finished.");
         return;
       }
       await navigate({ to: "/battle/$code", params: { code } });
@@ -84,7 +84,7 @@ function BattleLobby() {
 
   return (
     <main className="min-h-screen bg-background px-4 pb-24 pt-12 lg:pb-12">
-        <BottomNav />
+      <BottomNav />
       <div className="mx-auto w-full max-w-2xl">
         <Link
           to="/dashboard"

@@ -93,6 +93,15 @@ function saveDemoRoom(room: BattleRoom): void {
   }
 }
 
+/** True when this room was created locally (demo mode or cloud fallback). */
+export function isBattleRoomLocal(code: string): boolean {
+  return Boolean(loadDemoRooms()[code]);
+}
+
+async function useDemoBattlePath(code: string): Promise<boolean> {
+  return (await isDemo()) || isBattleRoomLocal(code);
+}
+
 function emptyRoom(userId: string, playerName: string, avatar: string): BattleRoom {
   return {
     id: crypto.randomUUID(),
@@ -140,18 +149,33 @@ export async function createBattleRoom(
   }
 
   const code = generateCode();
-  const { data, error } = await supabase
-    .from("battle_rooms")
-    .insert({ code, host_id: userId, host_name: playerName, host_avatar: avatar })
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("battle_rooms")
+      .insert({ code, host_id: userId, host_name: playerName, host_avatar: avatar })
+      .select()
+      .single();
 
-  if (error) throw error;
-  return mapRow(data as DbRow);
+    if (error) throw error;
+    return mapRow(data as DbRow);
+  } catch (err) {
+    // battle_rooms table not set up — fall back to local bot battle
+    console.warn("[battle] cloud room creation failed, falling back to bot mode:", err);
+    const room: BattleRoom = {
+      ...emptyRoom(userId, playerName, avatar),
+      code,
+      guestId: BOT_ID,
+      guestName: BOT_NAME,
+      guestAvatar: BOT_AVATAR,
+      status: "ready",
+    };
+    saveDemoRoom(room);
+    return room;
+  }
 }
 
 export async function fetchBattleRoom(code: string): Promise<BattleRoom | null> {
-  if (await isDemo()) {
+  if (await useDemoBattlePath(code)) {
     return loadDemoRooms()[code] ?? null;
   }
 
@@ -171,7 +195,7 @@ export async function joinBattleRoom(
   playerName: string,
   avatar: string,
 ): Promise<BattleRoom> {
-  if (await isDemo()) {
+  if (await useDemoBattlePath(code)) {
     const rooms = loadDemoRooms();
     const room = rooms[code];
     if (!room) throw new Error("Room not found");
@@ -204,7 +228,7 @@ export async function updateBattleConfig(
   topic: string,
   difficulty: "easy" | "medium" | "hard",
 ): Promise<void> {
-  if (await isDemo()) {
+  if (await useDemoBattlePath(code)) {
     const rooms = loadDemoRooms();
     const room = rooms[code];
     if (room) saveDemoRoom({ ...room, subject, topic, difficulty });
@@ -218,7 +242,7 @@ export async function startBattleWithQuestions(
   code: string,
   questions: PracticeQuestion[],
 ): Promise<void> {
-  if (await isDemo()) {
+  if (await useDemoBattlePath(code)) {
     const rooms = loadDemoRooms();
     const room = rooms[code];
     if (room) saveDemoRoom({ ...room, questions, status: "playing" });
@@ -238,7 +262,7 @@ export async function recordBattleAnswer(
   correct: boolean,
   finished: boolean,
 ): Promise<void> {
-  if (await isDemo()) {
+  if (await useDemoBattlePath(code)) {
     const rooms = loadDemoRooms();
     const room = rooms[code];
     if (!room) return;
@@ -290,7 +314,7 @@ export async function recordBattleAnswer(
 }
 
 export async function finalizeBattle(code: string, winnerId: string | null): Promise<void> {
-  if (await isDemo()) {
+  if (await useDemoBattlePath(code)) {
     const rooms = loadDemoRooms();
     const room = rooms[code];
     if (room) saveDemoRoom({ ...room, winnerId, status: "finished" });

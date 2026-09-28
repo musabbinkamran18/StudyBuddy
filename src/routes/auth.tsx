@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouterState, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +38,8 @@ const credentials = z.object({
 });
 
 function AuthPage() {
+  const searchStr = useRouterState({ select: (s) => s.location.searchStr });
+  const tab = new URLSearchParams(searchStr).get("tab");
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -231,7 +233,7 @@ function AuthPage() {
                 <span className="h-px flex-1 bg-border" />
               </div>
 
-              <Tabs defaultValue="signup">
+              <Tabs defaultValue={tab === "signin" ? "signin" : "signup"}>
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="signup">Sign up</TabsTrigger>
                   <TabsTrigger value="signin">Sign in</TabsTrigger>

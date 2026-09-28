@@ -10,6 +10,7 @@ import {
   recordBattleAnswer,
   finalizeBattle,
   subscribeToBattleRoom,
+  isBattleRoomLocal,
   BOT_ID,
   BOT_NAME,
   BOT_AVATAR,
@@ -120,8 +121,9 @@ function BattleRoom() {
 
     async function init() {
       const demoMode = await isDemo();
+      const botMode = demoMode || isBattleRoomLocal(code);
       if (cancelled) return;
-      setDemo(demoMode);
+      setDemo(botMode);
 
       let r = await fetchBattleRoom(code);
       if (!r) {
@@ -149,7 +151,7 @@ function BattleRoom() {
       }
 
       // Subscribe to DB changes (cloud mode only)
-      if (!demoMode) {
+      if (!botMode) {
         unsubRef.current = subscribeToBattleRoom(code, (updated) => {
           if (cancelled) return;
           setRoom(updated);

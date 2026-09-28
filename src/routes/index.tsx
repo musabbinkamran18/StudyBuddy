@@ -124,7 +124,9 @@ function Index() {
           </Button>
         ) : (
           <Button asChild>
-            <Link to="/auth">Sign in</Link>
+            <Link to="/auth" search={{ tab: "signin" }}>
+              Sign in
+            </Link>
           </Button>
         )}
       </header>
@@ -157,7 +159,9 @@ function Index() {
               variant="secondary"
               className="h-12 rounded-full px-8 text-base"
             >
-              <Link to="/auth">Sign in</Link>
+              <Link to="/auth" search={{ tab: "signin" }}>
+                Sign in
+              </Link>
             </Button>
           </div>
         </div>
